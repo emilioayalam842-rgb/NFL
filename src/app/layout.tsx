@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   title: "Zona Roja — Picks NFL con datos",
   description:
     "Estadísticas, resultados, calendario y recomendaciones de apuesta de la NFL basadas en datos.",
+  other: {
+    "color-scheme": "light",
+  },
 };
 
 export default async function RootLayout({
