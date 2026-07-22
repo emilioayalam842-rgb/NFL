@@ -22,30 +22,30 @@ export default async function MomiosPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-3xl mb-2">Momios</h1>
-      <p className="text-ink/60 mb-8 max-w-2xl">
+      <p className="text-fg/60 mb-8 max-w-2xl">
         Líneas y precios de casas de apuestas mexicanas, capturados y actualizados a mano por
         nuestro equipo. Los momios pueden cambiar en la casa real antes de que apuestes —
         confírmalos ahí antes de tirar tu dinero.
       </p>
 
       {games.length === 0 ? (
-        <p className="text-ink/60">Todavía no hay momios capturados para esta semana.</p>
+        <p className="text-fg/60">Todavía no hay momios capturados para esta semana.</p>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           {games.map((g) => (
-            <div key={g.id} className="border border-ink/10 bg-chalk p-5">
+            <div key={g.id} className="border border-fg/10 bg-surface p-5">
               <div className="flex items-center justify-between mb-4">
                 <p className="font-display text-xl">
                   {g.awayTeam.abbreviation} @ {g.homeTeam.abbreviation}
                 </p>
-                <p className="text-xs text-ink/50">
+                <p className="text-xs text-fg/50">
                   {g.startTime.toLocaleString("es-MX", { weekday: "short", hour: "numeric", minute: "2-digit" })}
                 </p>
               </div>
 
               <table className="w-full text-sm mb-4">
                 <thead>
-                  <tr className="text-left text-ink/50">
+                  <tr className="text-left text-fg/50">
                     <th className="py-1 font-normal">Equipo</th>
                     <th className="py-1 font-normal text-right">Spread</th>
                     <th className="py-1 font-normal text-right">Total</th>
@@ -53,7 +53,7 @@ export default async function MomiosPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-t border-ink/10">
+                  <tr className="border-t border-fg/10">
                     <td className="py-2 font-semibold">{g.awayTeam.abbreviation}</td>
                     <td className="py-2 text-right stat-num">
                       {g.marketSpread != null ? `+${g.marketSpread}` : "—"} {formatAmericanOdds(g.spreadAwayOdds)}
@@ -63,7 +63,7 @@ export default async function MomiosPage() {
                     </td>
                     <td className="py-2 text-right stat-num">{formatAmericanOdds(g.moneylineAwayOdds)}</td>
                   </tr>
-                  <tr className="border-t border-ink/10">
+                  <tr className="border-t border-fg/10">
                     <td className="py-2 font-semibold">{g.homeTeam.abbreviation}</td>
                     <td className="py-2 text-right stat-num">
                       {g.marketSpread != null ? `${-g.marketSpread}` : "—"} {formatAmericanOdds(g.spreadHomeOdds)}
@@ -78,10 +78,10 @@ export default async function MomiosPage() {
 
               {g.playerProps.length > 0 && (
                 <div>
-                  <p className="text-xs font-display tracking-wide text-ink/50 mb-2">PROPS DE JUGADOR</p>
+                  <p className="text-xs font-display tracking-wide text-fg/50 mb-2">PROPS DE JUGADOR</p>
                   <ul className="space-y-1 text-sm">
                     {g.playerProps.map((p) => (
-                      <li key={p.id} className="flex justify-between border-t border-ink/10 py-1.5">
+                      <li key={p.id} className="flex justify-between border-t border-fg/10 py-1.5">
                         <span>
                           {p.playerName} · {p.statLabel} {p.line}
                         </span>
@@ -95,7 +95,7 @@ export default async function MomiosPage() {
               )}
 
               {g.oddsSource && (
-                <p className="text-xs text-ink/40 mt-3">
+                <p className="text-xs text-fg/40 mt-3">
                   Fuente: {g.oddsSource}
                   {g.oddsUpdatedAt && ` · actualizado ${g.oddsUpdatedAt.toLocaleString("es-MX")}`}
                 </p>

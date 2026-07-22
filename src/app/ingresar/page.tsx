@@ -47,7 +47,7 @@ export default async function IngresarPage({
         <div className="flex flex-col gap-3 mb-6">
           {hasGoogle && (
             <form action={async () => { "use server"; await loginWithProvider("google"); }}>
-              <button className="flex w-full items-center justify-center gap-3 border border-ink/20 py-3 font-semibold hover:border-navy hover:bg-ink/[0.03] transition-colors">
+              <button className="flex w-full items-center justify-center gap-3 border border-fg/20 py-3 font-semibold hover:border-navy hover:bg-fg/[0.03] transition-colors">
                 <GoogleIcon /> Continuar con Google
               </button>
             </form>
@@ -63,20 +63,20 @@ export default async function IngresarPage({
       )}
 
       {(hasGoogle || hasApple) && (
-        <div className="flex items-center gap-3 my-6 text-xs text-ink/40">
-          <div className="flex-1 h-px bg-ink/10" />O<div className="flex-1 h-px bg-ink/10" />
+        <div className="flex items-center gap-3 my-6 text-xs text-fg/40">
+          <div className="flex-1 h-px bg-fg/10" />O<div className="flex-1 h-px bg-fg/10" />
         </div>
       )}
 
       <form action={loginWithCredentials} className="flex flex-col gap-3">
-        <input name="email" type="email" required placeholder="Correo" className="border border-ink/20 px-3 py-2.5 bg-chalk" />
-        <input name="password" type="password" required placeholder="Contraseña" className="border border-ink/20 px-3 py-2.5 bg-chalk" />
+        <input name="email" type="email" required placeholder="Correo" className="border border-fg/20 px-3 py-2.5 bg-surface" />
+        <input name="password" type="password" required placeholder="Contraseña" className="border border-fg/20 px-3 py-2.5 bg-surface" />
         <button type="submit" className="btn btn-dark w-full">
           Entrar
         </button>
       </form>
 
-      <p className="text-sm text-ink/60 mt-8 text-center">¿No tienes cuenta?</p>
+      <p className="text-sm text-fg/60 mt-8 text-center">¿No tienes cuenta?</p>
       <Link href="/registro" className="btn btn-outline-dark w-full mt-2">
         Regístrate
       </Link>

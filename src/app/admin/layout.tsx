@@ -16,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <span className="bg-red text-chalk text-[11px] font-display tracking-widest px-2 py-1">ADMIN</span>
         <h1 className="text-2xl">Panel de administración</h1>
       </div>
-      <nav className="flex gap-6 border-b border-ink/10 mb-8 font-display text-sm tracking-wide">
+      <nav className="flex gap-6 border-b border-fg/10 mb-8 font-display text-sm tracking-wide">
         {ADMIN_NAV.map((link) => (
           <Link key={link.href} href={link.href} className="pb-3 hover:text-red transition-colors">
             {link.label}

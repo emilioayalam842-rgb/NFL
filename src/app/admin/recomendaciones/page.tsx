@@ -14,15 +14,15 @@ export default async function AdminRecomendacionesPage() {
       <h2 className="text-xl mb-6">Picks generados</h2>
       <div className="space-y-3">
         {recs.map((r) => (
-          <div key={r.id} className="border border-ink/10 bg-chalk p-4 flex flex-wrap items-center gap-4">
+          <div key={r.id} className="border border-fg/10 bg-surface p-4 flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[220px]">
               <span className="text-[11px] font-display tracking-widest text-red">
                 {RECOMMENDATION_TYPE_LABEL[r.type]}
               </span>
               <p className="font-display">
-                {r.pick} <span className="text-ink/40 text-sm">— {r.game.awayTeam.abbreviation} @ {r.game.homeTeam.abbreviation}</span>
+                {r.pick} <span className="text-fg/40 text-sm">— {r.game.awayTeam.abbreviation} @ {r.game.homeTeam.abbreviation}</span>
               </p>
-              <p className="text-xs text-ink/50">
+              <p className="text-xs text-fg/50">
                 Confianza {(r.confidence * 100).toFixed(0)}% · {r.rationale}
               </p>
             </div>
@@ -38,7 +38,7 @@ export default async function AdminRecomendacionesPage() {
           </div>
         ))}
         {recs.length === 0 && (
-          <p className="text-ink/60">
+          <p className="text-fg/60">
             No hay picks generados. Ve a &ldquo;Juegos&rdquo; y usa &ldquo;Generar picks&rdquo; en un juego.
           </p>
         )}

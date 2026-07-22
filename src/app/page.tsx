@@ -55,7 +55,7 @@ export default async function Home() {
         <div className="flex items-baseline justify-between mb-6">
           <h2 className="text-2xl">Esta semana</h2>
           {!live && (
-            <span className="text-xs text-ink/50">
+            <span className="text-xs text-fg/50">
               (datos de muestra — sin conexión a ESPN en este entorno)
             </span>
           )}
@@ -73,19 +73,19 @@ export default async function Home() {
         <h2 className="text-2xl mb-6">Picks destacados</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           {DEMO_RECOMMENDATIONS.map((r, i) => (
-            <div key={i} className="border border-ink/10 bg-chalk p-5">
+            <div key={i} className="border border-fg/10 bg-surface p-5">
               <span className="text-[11px] font-display tracking-widest text-red">
                 {RECOMMENDATION_TYPE_LABEL[r.type]}
               </span>
               <p className="font-display text-xl mt-1 mb-2">{r.pick}</p>
-              <div className="h-1.5 bg-ink/10 mb-2">
+              <div className="h-1.5 bg-fg/10 mb-2">
                 <div className="h-full bg-red" style={{ width: `${r.confidence * 100}%` }} />
               </div>
-              <p className="text-sm text-ink/70">{r.rationale}</p>
+              <p className="text-sm text-fg/70">{r.rationale}</p>
             </div>
           ))}
         </div>
-        <p className="text-xs text-ink/50 mt-6 max-w-2xl">
+        <p className="text-xs text-fg/50 mt-6 max-w-2xl">
           Los picks completos y actualizados cada semana son para suscriptores. Esto es un análisis
           estadístico informativo, no una garantía de resultado — apostar implica riesgo real de
           perder dinero.

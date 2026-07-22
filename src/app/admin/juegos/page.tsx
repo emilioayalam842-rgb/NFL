@@ -22,7 +22,7 @@ export default async function AdminJuegosPage() {
             Sincronizar calendario (semana actual)
           </button>
         </form>
-        <p className="text-xs text-ink/50 max-w-md">
+        <p className="text-xs text-fg/50 max-w-md">
           Trae datos de ESPN. Requiere que el entorno donde corre la app tenga salida a internet
           (no siempre disponible en sandboxes de desarrollo).
         </p>
@@ -31,12 +31,12 @@ export default async function AdminJuegosPage() {
       <h2 className="text-xl mb-4">Juegos ({games.length})</h2>
       <div className="space-y-3">
         {games.map((g) => (
-          <div key={g.id} className="border border-ink/10 bg-chalk p-4 flex flex-wrap items-center gap-4">
+          <div key={g.id} className="border border-fg/10 bg-surface p-4 flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[160px]">
               <p className="font-display">
                 {g.awayTeam.abbreviation} @ {g.homeTeam.abbreviation}
               </p>
-              <p className="text-xs text-ink/50">
+              <p className="text-xs text-fg/50">
                 Semana {g.week} · {g.status} · {g.startTime.toLocaleDateString("es-MX")}
               </p>
             </div>
@@ -60,7 +60,7 @@ export default async function AdminJuegosPage() {
                 step="0.5"
                 defaultValue={g.marketSpread ?? ""}
                 placeholder="Spread"
-                className="w-24 border border-ink/20 px-2 py-1 bg-chalk"
+                className="w-24 border border-fg/20 px-2 py-1 bg-surface"
               />
               <input
                 name="total"
@@ -68,9 +68,9 @@ export default async function AdminJuegosPage() {
                 step="0.5"
                 defaultValue={g.marketTotal ?? ""}
                 placeholder="Total"
-                className="w-24 border border-ink/20 px-2 py-1 bg-chalk"
+                className="w-24 border border-fg/20 px-2 py-1 bg-surface"
               />
-              <button className="border border-ink/20 px-3 py-1.5 hover:border-navy">Guardar líneas</button>
+              <button className="border border-fg/20 px-3 py-1.5 hover:border-navy">Guardar líneas</button>
             </form>
 
             <form action={async () => { "use server"; await generateRecsAction(g.id); }}>
@@ -81,7 +81,7 @@ export default async function AdminJuegosPage() {
           </div>
         ))}
         {games.length === 0 && (
-          <p className="text-ink/60">
+          <p className="text-fg/60">
             No hay juegos en la base de datos. Sincroniza equipos y calendario primero.
           </p>
         )}

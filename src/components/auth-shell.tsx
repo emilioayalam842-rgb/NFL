@@ -23,7 +23,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       </svg>
 
       <div className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24 flex justify-center">
-        <div className="w-full max-w-sm bg-chalk text-ink p-8 shadow-2xl">{children}</div>
+        <div className="w-full max-w-sm bg-surface text-fg p-8 shadow-2xl">{children}</div>
       </div>
     </div>
   );

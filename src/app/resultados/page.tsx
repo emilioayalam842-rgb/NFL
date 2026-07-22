@@ -30,11 +30,11 @@ export default async function ResultadosPage({
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-3xl mb-2">Resultados</h1>
       {!live && (
-        <p className="text-xs text-ink/50 mb-6">datos de muestra — sin conexión a ESPN en este entorno</p>
+        <p className="text-xs text-fg/50 mb-6">datos de muestra — sin conexión a ESPN en este entorno</p>
       )}
 
       {finals.length === 0 ? (
-        <p className="text-ink/60 mt-6">Todavía no hay resultados finales esta semana.</p>
+        <p className="text-fg/60 mt-6">Todavía no hay resultados finales esta semana.</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6">
           {finals.map((g) => (

@@ -26,10 +26,14 @@ export const metadata: Metadata = {
   title: "Zona Roja — Picks NFL con datos",
   description:
     "Estadísticas, resultados, calendario y recomendaciones de apuesta de la NFL basadas en datos.",
-  other: {
-    "color-scheme": "light",
-  },
 };
+
+const THEME_INIT_SCRIPT = `
+try {
+  var t = localStorage.getItem('theme');
+  if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+} catch (e) {}
+`;
 
 export default async function RootLayout({
   children,
@@ -42,8 +46,12 @@ export default async function RootLayout({
     <html
       lang="es"
       className={`${anton.variable} ${barlow.variable} ${jetbrains.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-cream text-ink">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-full flex flex-col bg-page text-fg">
         <SiteHeader session={session} />
         <main className="flex-1">{children}</main>
         <SiteFooter />

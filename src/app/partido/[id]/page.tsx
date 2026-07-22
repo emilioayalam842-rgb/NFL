@@ -53,13 +53,13 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
       </div>
 
       {!boxscore ? (
-        <p className="text-ink/60">Sin estadísticas detalladas todavía para este partido.</p>
+        <p className="text-fg/60">Sin estadísticas detalladas todavía para este partido.</p>
       ) : (
         <>
           {boxscore.teamStats.length > 0 && (
             <div className="mb-10">
               <h2 className="text-xl mb-4">Estadísticas de equipo</h2>
-              <table className="w-full text-sm border border-ink/10">
+              <table className="w-full text-sm border border-fg/10">
                 <thead className="bg-navy text-chalk font-display tracking-wide">
                   <tr>
                     <th className="text-left px-4 py-2">{game.away.abbr}</th>
@@ -69,9 +69,9 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
                 </thead>
                 <tbody>
                   {boxscore.teamStats.map((row, i) => (
-                    <tr key={row.label} className={i % 2 ? "bg-chalk" : "bg-cream-dim"}>
+                    <tr key={row.label} className={i % 2 ? "bg-surface" : "bg-surface-alt"}>
                       <td className="px-4 py-2 stat-num">{row.away}</td>
-                      <td className="px-4 py-2 text-center text-ink/50">{row.label}</td>
+                      <td className="px-4 py-2 text-center text-fg/50">{row.label}</td>
                       <td className="px-4 py-2 text-right stat-num">{row.home}</td>
                     </tr>
                   ))}
@@ -91,18 +91,18 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
                     </p>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-xs text-ink/50 mb-1">{game.away.abbr}</p>
+                        <p className="text-xs text-fg/50 mb-1">{game.away.abbr}</p>
                         {cat.away.map((p) => (
                           <p key={p.name}>
-                            {p.name} <span className="text-ink/50">{p.stats[0]}</span>
+                            {p.name} <span className="text-fg/50">{p.stats[0]}</span>
                           </p>
                         ))}
                       </div>
                       <div>
-                        <p className="text-xs text-ink/50 mb-1">{game.home.abbr}</p>
+                        <p className="text-xs text-fg/50 mb-1">{game.home.abbr}</p>
                         {cat.home.map((p) => (
                           <p key={p.name}>
-                            {p.name} <span className="text-ink/50">{p.stats[0]}</span>
+                            {p.name} <span className="text-fg/50">{p.stats[0]}</span>
                           </p>
                         ))}
                       </div>

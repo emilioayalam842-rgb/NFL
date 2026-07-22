@@ -43,7 +43,7 @@ export default async function RecomendacionesPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-3xl mb-2">Picks de la semana</h1>
-      <p className="text-ink/60 mb-8 max-w-2xl">
+      <p className="text-fg/60 mb-8 max-w-2xl">
         Spread, moneyline, over/under y props de jugador — generados con un modelo estadístico a
         partir de forma reciente de equipos y jugadores. Análisis informativo, no garantía de
         resultado.
@@ -63,18 +63,18 @@ export default async function RecomendacionesPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {recs.map((r, i) => (
-          <div key={i} className="border border-ink/10 bg-chalk p-5 relative overflow-hidden">
+          <div key={i} className="border border-fg/10 bg-surface p-5 relative overflow-hidden">
             <span className="text-[11px] font-display tracking-widest text-red">
               {RECOMMENDATION_TYPE_LABEL[r.type]}
             </span>
-            <p className="text-xs text-ink/50 mb-1">{r.gameLabel}</p>
+            <p className="text-xs text-fg/50 mb-1">{r.gameLabel}</p>
             <p className={`font-display text-xl mt-1 mb-2 ${!hasAccess ? "blur-sm select-none" : ""}`}>
               {r.pick}
             </p>
-            <div className="h-1.5 bg-ink/10 mb-2">
+            <div className="h-1.5 bg-fg/10 mb-2">
               <div className="h-full bg-red" style={{ width: `${r.confidence * 100}%` }} />
             </div>
-            <p className={`text-sm text-ink/70 ${!hasAccess ? "blur-sm select-none" : ""}`}>
+            <p className={`text-sm text-fg/70 ${!hasAccess ? "blur-sm select-none" : ""}`}>
               {r.rationale}
             </p>
           </div>

@@ -24,7 +24,7 @@ export default async function CuentaPage({
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="text-3xl mb-2">Mi cuenta</h1>
-      <p className="text-ink/60 mb-8">{user?.email}</p>
+      <p className="text-fg/60 mb-8">{user?.email}</p>
 
       {excluido && (
         <p className="bg-red/10 text-red text-sm px-4 py-3 mb-6 border border-red/30">
@@ -35,11 +35,11 @@ export default async function CuentaPage({
       <section className="mb-10">
         <h2 className="font-display text-xl mb-4">Suscripciones</h2>
         {subscriptions.length === 0 ? (
-          <p className="text-ink/60">Aún no tienes ninguna suscripción.</p>
+          <p className="text-fg/60">Aún no tienes ninguna suscripción.</p>
         ) : (
           <ul className="space-y-2">
             {subscriptions.map((s) => (
-              <li key={s.id} className="border border-ink/10 px-4 py-3 flex items-center justify-between text-sm">
+              <li key={s.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
                 <span>{s.plan.name}</span>
                 <span className="font-semibold">{s.status}</span>
               </li>
@@ -48,9 +48,9 @@ export default async function CuentaPage({
         )}
       </section>
 
-      <section className="border border-ink/10 p-6">
+      <section className="border border-fg/10 p-6">
         <h2 className="font-display text-xl mb-2">Juego responsable</h2>
-        <p className="text-sm text-ink/60 mb-4">
+        <p className="text-sm text-fg/60 mb-4">
           Si necesitas pausar tus apuestas, puedes bloquear temporalmente nuevas suscripciones en tu
           cuenta. Esto no cancela una suscripción activa, solo evita que compres una nueva.
         </p>
@@ -66,7 +66,7 @@ export default async function CuentaPage({
             "use server";
             await setSelfExclusion(Number(formData.get("days")));
           }} className="flex flex-wrap items-center gap-3">
-            <select name="days" className="border border-ink/20 px-3 py-2 bg-chalk text-sm">
+            <select name="days" className="border border-fg/20 px-3 py-2 bg-surface text-sm">
               <option value="30">30 días</option>
               <option value="90">90 días</option>
               <option value="365">1 año</option>

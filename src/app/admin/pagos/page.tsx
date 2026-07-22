@@ -17,11 +17,11 @@ export default async function AdminPagosPage() {
       <h2 className="text-xl mb-6">Reportes de transferencia</h2>
       <div className="space-y-4">
         {claims.map((c) => (
-          <div key={c.id} className="border border-ink/10 bg-chalk p-5">
+          <div key={c.id} className="border border-fg/10 bg-surface p-5">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div>
                 <p className="font-semibold">{c.user.email}</p>
-                <p className="text-sm text-ink/60">
+                <p className="text-sm text-fg/60">
                   {c.subscription.plan.name} · {formatMXN(c.amountMXN)}
                 </p>
               </div>
@@ -33,7 +33,7 @@ export default async function AdminPagosPage() {
                     ? "bg-ink text-chalk"
                     : c.status === "MANUAL_REVIEW"
                     ? "bg-yellow-600 text-chalk"
-                    : "bg-cream-dim"
+                    : "bg-surface-alt"
                 }`}
               >
                 {c.status}
@@ -42,31 +42,31 @@ export default async function AdminPagosPage() {
 
             <dl className="grid sm:grid-cols-4 gap-3 text-sm mb-4">
               <div>
-                <dt className="text-ink/50">Folio</dt>
+                <dt className="text-fg/50">Folio</dt>
                 <dd className="stat-num">{c.claveRastreo}</dd>
               </div>
               <div>
-                <dt className="text-ink/50">Fecha</dt>
+                <dt className="text-fg/50">Fecha</dt>
                 <dd>{c.fechaOperacion.toLocaleDateString("es-MX")}</dd>
               </div>
               <div>
-                <dt className="text-ink/50">Banco emisor</dt>
+                <dt className="text-fg/50">Banco emisor</dt>
                 <dd>{c.bancoEmisor}</dd>
               </div>
               <div>
-                <dt className="text-ink/50">Cuenta ordenante</dt>
+                <dt className="text-fg/50">Cuenta ordenante</dt>
                 <dd>{c.cuentaOrdenante}</dd>
               </div>
             </dl>
 
             {c.banxicoResponse && (
-              <p className="text-xs text-ink/50 mb-4">Última respuesta del bot: {c.banxicoResponse}</p>
+              <p className="text-xs text-fg/50 mb-4">Última respuesta del bot: {c.banxicoResponse}</p>
             )}
 
             {(c.status === "PENDING" || c.status === "MANUAL_REVIEW") && (
               <div className="flex flex-wrap gap-3">
                 <form action={async () => { "use server"; await rerunAutoVerify(c.id); }}>
-                  <button className="border border-ink/20 px-3 py-1.5 text-sm hover:border-navy">
+                  <button className="border border-fg/20 px-3 py-1.5 text-sm hover:border-navy">
                     Reintentar verificación Banxico
                   </button>
                 </form>
@@ -80,7 +80,7 @@ export default async function AdminPagosPage() {
             )}
           </div>
         ))}
-        {claims.length === 0 && <p className="text-ink/60">No hay reportes de pago todavía.</p>}
+        {claims.length === 0 && <p className="text-fg/60">No hay reportes de pago todavía.</p>}
       </div>
     </div>
   );

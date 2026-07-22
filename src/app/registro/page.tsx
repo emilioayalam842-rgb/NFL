@@ -60,22 +60,22 @@ export default function RegistroPage() {
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input name="name" required placeholder="Nombre" className="border border-ink/20 px-3 py-2.5 bg-chalk" />
-        <input name="email" type="email" required placeholder="Correo" className="border border-ink/20 px-3 py-2.5 bg-chalk" />
+        <input name="name" required placeholder="Nombre" className="border border-fg/20 px-3 py-2.5 bg-surface" />
+        <input name="email" type="email" required placeholder="Correo" className="border border-fg/20 px-3 py-2.5 bg-surface" />
         <input
           name="password"
           type="password"
           required
           minLength={8}
           placeholder="Contraseña (mín. 8 caracteres)"
-          className="border border-ink/20 px-3 py-2.5 bg-chalk"
+          className="border border-fg/20 px-3 py-2.5 bg-surface"
         />
         <button type="submit" disabled={loading} className="btn btn-dark w-full disabled:opacity-50">
           {loading ? "Creando…" : "Crear cuenta"}
         </button>
       </form>
 
-      <p className="text-sm text-ink/60 mt-8 text-center">¿Ya tienes cuenta?</p>
+      <p className="text-sm text-fg/60 mt-8 text-center">¿Ya tienes cuenta?</p>
       <Link href="/ingresar" className="btn btn-outline-dark w-full mt-2">
         Ingresa
       </Link>

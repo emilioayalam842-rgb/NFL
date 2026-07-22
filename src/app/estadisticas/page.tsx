@@ -37,12 +37,12 @@ export default async function EstadisticasPage() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-3xl mb-2">Estadísticas de jugadores</h1>
       {dbStats.length === 0 && (
-        <p className="text-xs text-ink/50 mb-6">
+        <p className="text-xs text-fg/50 mb-6">
           datos de muestra — sincroniza el calendario desde el panel admin para ver datos reales
         </p>
       )}
 
-      <div className="overflow-x-auto border border-ink/10">
+      <div className="overflow-x-auto border border-fg/10">
         <table className="w-full text-sm">
           <thead className="bg-navy text-chalk font-display tracking-wide">
             <tr>
@@ -59,7 +59,7 @@ export default async function EstadisticasPage() {
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr key={i} className={i % 2 ? "bg-chalk" : "bg-cream-dim"}>
+              <tr key={i} className={i % 2 ? "bg-surface" : "bg-surface-alt"}>
                 <td className="px-4 py-2 font-semibold">{r.player}</td>
                 <td className="px-4 py-2">{r.team}</td>
                 <td className="px-4 py-2">{r.position}</td>

@@ -38,7 +38,7 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="text-3xl mb-2">Plan {subscription.plan.name}</h1>
-      <p className="text-ink/60 mb-8">
+      <p className="text-fg/60 mb-8">
         {formatMXN(subscription.plan.priceMXN)} · Estado de suscripción:{" "}
         <span className="font-semibold">{subscription.status}</span>
       </p>
@@ -68,7 +68,7 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
         </p>
       </div>
 
-      <div className="border border-ink/10 p-6 mb-8">
+      <div className="border border-fg/10 p-6 mb-8">
         <h2 className="font-display text-xl mb-4">2. Reporta tu transferencia</h2>
         <form
           action={async (formData) => {
@@ -83,17 +83,17 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
               name="claveRastreo"
               required
               minLength={6}
-              className="border border-ink/20 px-3 py-2 bg-chalk"
+              className="border border-fg/20 px-3 py-2 bg-surface"
               placeholder="MBAN01001..."
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
             Fecha de la transferencia
-            <input name="fechaOperacion" type="date" required className="border border-ink/20 px-3 py-2 bg-chalk" />
+            <input name="fechaOperacion" type="date" required className="border border-fg/20 px-3 py-2 bg-surface" />
           </label>
           <label className="flex flex-col gap-1 text-sm">
             Banco desde donde transferiste
-            <select name="bancoEmisor" required className="border border-ink/20 px-3 py-2 bg-chalk">
+            <select name="bancoEmisor" required className="border border-fg/20 px-3 py-2 bg-surface">
               {BANK_CODES.map((b) => (
                 <option key={b.code} value={b.code}>
                   {b.name}
@@ -103,7 +103,7 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
           </label>
           <label className="flex flex-col gap-1 text-sm sm:col-span-2">
             Tu CLABE o cuenta de origen
-            <input name="cuentaOrdenante" required minLength={4} className="border border-ink/20 px-3 py-2 bg-chalk" />
+            <input name="cuentaOrdenante" required minLength={4} className="border border-fg/20 px-3 py-2 bg-surface" />
           </label>
 
           <button
@@ -121,7 +121,7 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
           <h2 className="font-display text-xl mb-4">Historial</h2>
           <ul className="space-y-2 text-sm">
             {subscription.paymentClaims.map((c) => (
-              <li key={c.id} className="border border-ink/10 px-4 py-3 flex justify-between">
+              <li key={c.id} className="border border-fg/10 px-4 py-3 flex justify-between">
                 <span>Folio {c.claveRastreo}</span>
                 <span className="font-semibold">{CLAIM_STATUS_LABEL[c.status]}</span>
               </li>

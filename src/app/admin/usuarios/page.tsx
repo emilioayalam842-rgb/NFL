@@ -10,7 +10,7 @@ export default async function AdminUsuariosPage() {
   return (
     <div>
       <h2 className="text-xl mb-6">Usuarios</h2>
-      <div className="overflow-x-auto border border-ink/10">
+      <div className="overflow-x-auto border border-fg/10">
         <table className="w-full text-sm">
           <thead className="bg-navy text-chalk font-display tracking-wide">
             <tr>
@@ -24,7 +24,7 @@ export default async function AdminUsuariosPage() {
           </thead>
           <tbody>
             {users.map((u, i) => (
-              <tr key={u.id} className={i % 2 ? "bg-chalk" : "bg-cream-dim"}>
+              <tr key={u.id} className={i % 2 ? "bg-surface" : "bg-surface-alt"}>
                 <td className="px-4 py-2">{u.name ?? "—"}</td>
                 <td className="px-4 py-2">{u.email}</td>
                 <td className="px-4 py-2">{u.role}</td>
@@ -36,7 +36,7 @@ export default async function AdminUsuariosPage() {
                 </td>
                 <td className="px-4 py-2">
                   <form action={async () => { "use server"; await toggleUserRole(u.id); }}>
-                    <button className="border border-ink/20 px-2 py-1 text-xs hover:border-navy">
+                    <button className="border border-fg/20 px-2 py-1 text-xs hover:border-navy">
                       {u.role === "ADMIN" ? "Quitar admin" : "Hacer admin"}
                     </button>
                   </form>

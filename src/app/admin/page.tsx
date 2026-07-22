@@ -20,9 +20,9 @@ export default async function AdminDashboardPage() {
   return (
     <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {cards.map((c) => (
-        <div key={c.label} className="border border-ink/10 bg-chalk p-5">
+        <div key={c.label} className="border border-fg/10 bg-surface p-5">
           <p className="stat-num text-4xl font-semibold">{c.value}</p>
-          <p className="text-sm text-ink/60 mt-1">{c.label}</p>
+          <p className="text-sm text-fg/60 mt-1">{c.label}</p>
         </div>
       ))}
     </div>

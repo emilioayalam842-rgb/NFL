@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Session } from "next-auth";
 import { signOut } from "@/auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
   { href: "/calendario", label: "Calendario" },
@@ -18,7 +19,15 @@ export function SiteHeader({ session }: { session: Session | null }) {
       <div className="bg-navy text-chalk">
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center shrink-0">
-            <Image src="/logo-light-v2.png" alt="Zona Roja" width={220} height={32} priority className="h-8 w-auto" />
+            <Image
+              src="/logo-light-v2.png"
+              alt="Zona Roja"
+              width={222}
+              height={32}
+              priority
+              className="h-8 w-auto"
+              style={{ width: "auto", height: "2rem" }}
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 font-display text-sm tracking-wider">
@@ -35,6 +44,7 @@ export function SiteHeader({ session }: { session: Session | null }) {
           </nav>
 
           <div className="flex items-center gap-3 shrink-0">
+            <ThemeToggle />
             {session?.user ? (
               <>
                 <Link

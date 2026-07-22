@@ -4,7 +4,7 @@ import type { DisplayGame } from "@/lib/espn/format";
 function statusBadge(game: DisplayGame) {
   if (game.status === "FINAL") return { text: "FINAL", cls: "bg-ink text-chalk" };
   if (game.status === "IN_PROGRESS") return { text: "EN VIVO", cls: "bg-red text-chalk animate-pulse" };
-  return { text: new Date(game.kickoff).toLocaleString("es-MX", { weekday: "short", hour: "numeric", minute: "2-digit" }), cls: "bg-cream-dim text-ink" };
+  return { text: new Date(game.kickoff).toLocaleString("es-MX", { weekday: "short", hour: "numeric", minute: "2-digit" }), cls: "bg-surface-alt text-fg" };
 }
 
 export function GameCard({ game }: { game: DisplayGame }) {
