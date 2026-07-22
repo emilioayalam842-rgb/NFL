@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="hash-divider" />
       <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 sm:grid-cols-3 text-sm">
         <div>
-          <Image src="/logo-light.png" alt="Zona Roja" width={165} height={24} className="h-6 w-auto mb-3" />
+          <Image src="/logo-light-v2.png" alt="Zona Roja" width={165} height={24} className="h-6 w-auto mb-3" />
           <p>Estadísticas y picks de NFL basados en datos. No somos una casa de apuestas.</p>
         </div>
         <div>

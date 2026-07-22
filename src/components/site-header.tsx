@@ -18,7 +18,7 @@ export function SiteHeader({ session }: { session: Session | null }) {
       <div className="bg-navy text-chalk">
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center shrink-0">
-            <Image src="/logo-light.png" alt="Zona Roja" width={220} height={32} priority className="h-8 w-auto" />
+            <Image src="/logo-light-v2.png" alt="Zona Roja" width={220} height={32} priority className="h-8 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 font-display text-sm tracking-wider">
