@@ -50,16 +50,11 @@ export function SiteHeader({ session }: { session: Session | null }) {
                     await signOut({ redirectTo: "/" });
                   }}
                 >
-                  <button className="text-sm border border-chalk/30 px-3 py-1.5 hover:border-red hover:text-red transition-colors">
-                    Salir
-                  </button>
+                  <button className="btn btn-outline btn-sm">Salir</button>
                 </form>
               </>
             ) : (
-              <Link
-                href="/ingresar"
-                className="bg-red text-chalk font-display tracking-wide text-sm px-4 py-2 hover:bg-red-dark transition-colors"
-              >
+              <Link href="/ingresar" className="btn btn-primary btn-sm">
                 Ingresar
               </Link>
             )}

@@ -25,7 +25,7 @@ export default async function Home() {
         }} />
         <div className="mx-auto max-w-6xl px-4 py-16 sm:py-24 relative">
           <p className="font-display tracking-[0.3em] text-red text-sm mb-4">TEMPORADA REGULAR</p>
-          <h1 className="font-display text-5xl sm:text-7xl leading-[0.95] mb-6 max-w-2xl">
+          <h1 className="font-display text-5xl sm:text-7xl leading-[1.15] mb-6 max-w-2xl">
             Sin humo.
             <br />
             Solo números.
@@ -35,11 +35,11 @@ export default async function Home() {
             (spread, moneyline, over/under y props) generadas con un modelo estadístico — semana
             tras semana de la NFL.
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/planes" className="bg-red px-6 py-3 font-display tracking-wide hover:bg-red-dark transition-colors">
+          <div className="flex flex-wrap gap-5">
+            <Link href="/planes" className="btn btn-primary">
               Ver planes
             </Link>
-            <Link href="/calendario" className="border border-chalk/40 px-6 py-3 font-display tracking-wide hover:border-red hover:text-red transition-colors">
+            <Link href="/calendario" className="btn btn-outline">
               Calendario completo
             </Link>
           </div>
@@ -87,7 +87,7 @@ export default async function Home() {
           estadístico informativo, no una garantía de resultado — apostar implica riesgo real de
           perder dinero.
         </p>
-        <Link href="/planes" className="inline-block mt-4 bg-navy text-chalk px-6 py-3 font-display tracking-wide hover:bg-navy-dark transition-colors">
+        <Link href="/planes" className="btn btn-dark mt-6">
           Quiero ver todos los picks
         </Link>
       </section>

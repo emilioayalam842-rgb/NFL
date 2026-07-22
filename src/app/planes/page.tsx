@@ -45,9 +45,7 @@ export default async function PlanesPage() {
               </ul>
               <Link
                 href={`/suscripcion/nueva?plan=${plan.slug}`}
-                className={`text-center py-3 font-display tracking-wide transition-colors ${
-                  highlight ? "bg-red hover:bg-red-dark" : "bg-navy text-chalk hover:bg-navy-dark"
-                }`}
+                className={`btn ${highlight ? "btn-primary" : "btn-dark"}`}
               >
                 Elegir {plan.name}
               </Link>

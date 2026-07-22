@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { AuthShell } from "@/components/auth-shell";
 
 export default function RegistroPage() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function RegistroPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-16">
+    <AuthShell>
       <h1 className="text-3xl mb-8">Crear cuenta</h1>
 
       {error && (
@@ -69,21 +70,15 @@ export default function RegistroPage() {
           placeholder="Contraseña (mín. 8 caracteres)"
           className="border border-ink/20 px-3 py-2.5 bg-chalk"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-navy text-chalk py-3 font-display tracking-wide hover:bg-navy-dark transition-colors disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="btn btn-dark w-full disabled:opacity-50">
           {loading ? "Creando…" : "Crear cuenta"}
         </button>
       </form>
 
-      <p className="text-sm text-ink/60 mt-6">
-        ¿Ya tienes cuenta?{" "}
-        <Link href="/ingresar" className="text-red font-semibold">
-          Ingresa
-        </Link>
-      </p>
-    </div>
+      <p className="text-sm text-ink/60 mt-8 text-center">¿Ya tienes cuenta?</p>
+      <Link href="/ingresar" className="btn btn-outline-dark w-full mt-2">
+        Ingresa
+      </Link>
+    </AuthShell>
   );
 }

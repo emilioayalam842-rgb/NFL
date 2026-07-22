@@ -109,7 +109,7 @@ export default async function SuscripcionDetallePage({ params }: { params: Promi
           <button
             type="submit"
             disabled={hasPendingOrVerified}
-            className="sm:col-span-2 bg-red text-chalk py-3 font-display tracking-wide hover:bg-red-dark transition-colors disabled:opacity-40"
+            className="btn btn-primary sm:col-span-2 disabled:opacity-40"
           >
             {hasPendingOrVerified ? "Ya reportaste esta transferencia" : "Confirmar transferencia"}
           </button>
