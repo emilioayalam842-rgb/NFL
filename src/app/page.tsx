@@ -26,9 +26,9 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:py-24 relative">
           <p className="font-display tracking-[0.3em] text-red text-sm mb-4">TEMPORADA REGULAR</p>
           <h1 className="font-display text-5xl sm:text-7xl leading-[0.95] mb-6 max-w-2xl">
-            Picks con datos,
+            Sin humo.
             <br />
-            no con corazonadas.
+            Solo números.
           </h1>
           <p className="max-w-lg text-chalk/80 mb-8 text-lg">
             Estadísticas de jugadores, resultados, calendario completo y recomendaciones de apuesta
