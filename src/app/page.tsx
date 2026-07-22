@@ -3,6 +3,7 @@ import { getScoreboard } from "@/lib/espn/queries";
 import { toDisplayGame, type DisplayGame } from "@/lib/espn/format";
 import { DEMO_GAMES, DEMO_RECOMMENDATIONS, demoGameToDisplay } from "@/lib/demo-data";
 import { GameCard } from "@/components/game-card";
+import { LiveRefresher } from "@/components/live-refresher";
 import { RECOMMENDATION_TYPE_LABEL } from "@/lib/recommendations/labels";
 
 async function getThisWeek(): Promise<{ games: DisplayGame[]; live: boolean }> {
@@ -16,9 +17,11 @@ async function getThisWeek(): Promise<{ games: DisplayGame[]; live: boolean }> {
 
 export default async function Home() {
   const { games, live } = await getThisWeek();
+  const hasLiveGame = games.some((g) => g.status === "IN_PROGRESS");
 
   return (
     <div>
+      {hasLiveGame && <LiveRefresher intervalSeconds={20} />}
       <section className="bg-navy text-chalk relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: "repeating-linear-gradient(90deg, white 0 2px, transparent 2px 120px)",

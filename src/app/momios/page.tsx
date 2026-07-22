@@ -1,0 +1,109 @@
+import { prisma } from "@/lib/prisma";
+import { formatAmericanOdds } from "@/lib/odds-format";
+
+export const metadata = { title: "Momios — Zona Roja" };
+
+export default async function MomiosPage() {
+  const games = await prisma.game.findMany({
+    where: {
+      status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+      OR: [
+        { marketSpread: { not: null } },
+        { marketTotal: { not: null } },
+        { moneylineHomeOdds: { not: null } },
+        { playerProps: { some: {} } },
+      ],
+    },
+    include: { homeTeam: true, awayTeam: true, playerProps: true },
+    orderBy: { startTime: "asc" },
+    take: 30,
+  });
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <h1 className="text-3xl mb-2">Momios</h1>
+      <p className="text-ink/60 mb-8 max-w-2xl">
+        Líneas y precios de casas de apuestas mexicanas, capturados y actualizados a mano por
+        nuestro equipo. Los momios pueden cambiar en la casa real antes de que apuestes —
+        confírmalos ahí antes de tirar tu dinero.
+      </p>
+
+      {games.length === 0 ? (
+        <p className="text-ink/60">Todavía no hay momios capturados para esta semana.</p>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {games.map((g) => (
+            <div key={g.id} className="border border-ink/10 bg-chalk p-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="font-display text-xl">
+                  {g.awayTeam.abbreviation} @ {g.homeTeam.abbreviation}
+                </p>
+                <p className="text-xs text-ink/50">
+                  {g.startTime.toLocaleString("es-MX", { weekday: "short", hour: "numeric", minute: "2-digit" })}
+                </p>
+              </div>
+
+              <table className="w-full text-sm mb-4">
+                <thead>
+                  <tr className="text-left text-ink/50">
+                    <th className="py-1 font-normal">Equipo</th>
+                    <th className="py-1 font-normal text-right">Spread</th>
+                    <th className="py-1 font-normal text-right">Total</th>
+                    <th className="py-1 font-normal text-right">ML</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t border-ink/10">
+                    <td className="py-2 font-semibold">{g.awayTeam.abbreviation}</td>
+                    <td className="py-2 text-right stat-num">
+                      {g.marketSpread != null ? `+${g.marketSpread}` : "—"} {formatAmericanOdds(g.spreadAwayOdds)}
+                    </td>
+                    <td className="py-2 text-right stat-num">
+                      {g.marketTotal != null ? `O ${g.marketTotal}` : "—"} {formatAmericanOdds(g.totalOverOdds)}
+                    </td>
+                    <td className="py-2 text-right stat-num">{formatAmericanOdds(g.moneylineAwayOdds)}</td>
+                  </tr>
+                  <tr className="border-t border-ink/10">
+                    <td className="py-2 font-semibold">{g.homeTeam.abbreviation}</td>
+                    <td className="py-2 text-right stat-num">
+                      {g.marketSpread != null ? `${-g.marketSpread}` : "—"} {formatAmericanOdds(g.spreadHomeOdds)}
+                    </td>
+                    <td className="py-2 text-right stat-num">
+                      {g.marketTotal != null ? `U ${g.marketTotal}` : "—"} {formatAmericanOdds(g.totalUnderOdds)}
+                    </td>
+                    <td className="py-2 text-right stat-num">{formatAmericanOdds(g.moneylineHomeOdds)}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {g.playerProps.length > 0 && (
+                <div>
+                  <p className="text-xs font-display tracking-wide text-ink/50 mb-2">PROPS DE JUGADOR</p>
+                  <ul className="space-y-1 text-sm">
+                    {g.playerProps.map((p) => (
+                      <li key={p.id} className="flex justify-between border-t border-ink/10 py-1.5">
+                        <span>
+                          {p.playerName} · {p.statLabel} {p.line}
+                        </span>
+                        <span className="stat-num">
+                          O {formatAmericanOdds(p.overOdds)} / U {formatAmericanOdds(p.underOdds)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {g.oddsSource && (
+                <p className="text-xs text-ink/40 mt-3">
+                  Fuente: {g.oddsSource}
+                  {g.oddsUpdatedAt && ` · actualizado ${g.oddsUpdatedAt.toLocaleString("es-MX")}`}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

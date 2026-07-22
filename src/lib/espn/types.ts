@@ -81,8 +81,20 @@ export interface EspnBoxscoreTeamPlayers {
   statistics: EspnBoxscorePlayerCategory[];
 }
 
+export interface EspnBoxscoreTeamStat {
+  name: string;
+  displayValue: string;
+  label: string;
+}
+
+export interface EspnBoxscoreTeamStats {
+  team: EspnTeamRef;
+  statistics: EspnBoxscoreTeamStat[];
+}
+
 export interface EspnSummaryResponse {
   boxscore?: {
+    teams?: EspnBoxscoreTeamStats[];
     players?: EspnBoxscoreTeamPlayers[];
   };
   header?: {

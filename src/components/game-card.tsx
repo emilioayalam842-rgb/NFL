@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { DisplayGame } from "@/lib/espn/format";
 
 function statusBadge(game: DisplayGame) {
@@ -8,9 +9,10 @@ function statusBadge(game: DisplayGame) {
 
 export function GameCard({ game }: { game: DisplayGame }) {
   const badge = statusBadge(game);
+  const isRealEvent = /^\d+$/.test(game.id);
 
-  return (
-    <div className="relative bg-navy text-chalk border border-navy-dark overflow-hidden">
+  const content = (
+    <div className="relative bg-navy text-chalk border border-navy-dark overflow-hidden h-full">
       <div className="absolute top-0 right-0 h-full w-2 bg-red" />
       <div className="p-4 pr-6">
         <div className="flex items-center justify-between mb-3">
@@ -30,6 +32,14 @@ export function GameCard({ game }: { game: DisplayGame }) {
         )}
       </div>
     </div>
+  );
+
+  if (!isRealEvent) return content;
+
+  return (
+    <Link href={`/partido/${game.id}`} className="block hover:opacity-90 transition-opacity">
+      {content}
+    </Link>
   );
 }
 

@@ -193,11 +193,24 @@ model Game {
   marketSpread Float? // negative favors home team
   marketTotal  Float?
 
+  // Momios (precios americanos, ej. -110) capturados a mano por un admin
+  // viendo una casa de apuestas mexicana. Independientes de marketSpread/
+  // marketTotal, que son solo la línea usada por el motor de picks.
+  spreadHomeOdds    Int?
+  spreadAwayOdds    Int?
+  totalOverOdds     Int?
+  totalUnderOdds    Int?
+  moneylineHomeOdds Int?
+  moneylineAwayOdds Int?
+  oddsSource        String? // ej. "PlayDoit", "Caliente"
+  oddsUpdatedAt     DateTime?
+
   homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
   stats           PlayerGameStat[]
   recommendations Recommendation[]
+  playerProps     PlayerPropLine[]
 }
 
 enum GameStatus {
@@ -251,4 +264,22 @@ enum RecommendationType {
   MONEYLINE
   TOTAL
   PLAYER_PROP
+}
+
+// Momios de props de jugador capturados a mano (ej. "P. Mahomes — yardas de
+// pase, línea 275.5, over -115 / under -105"). Independiente de si el motor
+// de picks generó una recomendación sobre esa misma línea.
+model PlayerPropLine {
+  id         String   @id @default(cuid())
+  gameId     String
+  playerName String
+  statLabel  String // ej. "Yardas de pase", "Tacleadas"
+  line       Float
+  overOdds   Int?
+  underOdds  Int?
+  oddsSource String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
 }

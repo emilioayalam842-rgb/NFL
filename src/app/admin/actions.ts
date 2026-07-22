@@ -70,3 +70,67 @@ export async function togglePublished(recId: string) {
   await prisma.recommendation.update({ where: { id: recId }, data: { published: !rec.published } });
   revalidatePath("/admin/recomendaciones");
 }
+
+function parseOdds(value: FormDataEntryValue | null): number | null {
+  if (value == null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseLine(value: FormDataEntryValue | null): number | null {
+  if (value == null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+export async function updateGameOdds(gameId: string, formData: FormData) {
+  await requireAdmin();
+  await prisma.game.update({
+    where: { id: gameId },
+    data: {
+      marketSpread: parseLine(formData.get("marketSpread")),
+      marketTotal: parseLine(formData.get("marketTotal")),
+      spreadHomeOdds: parseOdds(formData.get("spreadHomeOdds")),
+      spreadAwayOdds: parseOdds(formData.get("spreadAwayOdds")),
+      totalOverOdds: parseOdds(formData.get("totalOverOdds")),
+      totalUnderOdds: parseOdds(formData.get("totalUnderOdds")),
+      moneylineHomeOdds: parseOdds(formData.get("moneylineHomeOdds")),
+      moneylineAwayOdds: parseOdds(formData.get("moneylineAwayOdds")),
+      oddsSource: (formData.get("oddsSource") as string) || null,
+      oddsUpdatedAt: new Date(),
+    },
+  });
+  revalidatePath("/admin/momios");
+  revalidatePath("/momios");
+}
+
+export async function addPlayerProp(gameId: string, formData: FormData) {
+  await requireAdmin();
+  const playerName = String(formData.get("playerName") ?? "").trim();
+  const statLabel = String(formData.get("statLabel") ?? "").trim();
+  const line = parseLine(formData.get("line"));
+  if (!playerName || !statLabel || line == null) {
+    throw new Error("Falta jugador, estadística o línea.");
+  }
+
+  await prisma.playerPropLine.create({
+    data: {
+      gameId,
+      playerName,
+      statLabel,
+      line,
+      overOdds: parseOdds(formData.get("overOdds")),
+      underOdds: parseOdds(formData.get("underOdds")),
+      oddsSource: (formData.get("oddsSource") as string) || null,
+    },
+  });
+  revalidatePath("/admin/momios");
+  revalidatePath("/momios");
+}
+
+export async function deletePlayerProp(propId: string) {
+  await requireAdmin();
+  await prisma.playerPropLine.delete({ where: { id: propId } });
+  revalidatePath("/admin/momios");
+  revalidatePath("/momios");
+}

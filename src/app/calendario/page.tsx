@@ -2,6 +2,7 @@ import { getScoreboard } from "@/lib/espn/queries";
 import { toDisplayGame, type DisplayGame } from "@/lib/espn/format";
 import { DEMO_GAMES, demoGameToDisplay } from "@/lib/demo-data";
 import { GameCard } from "@/components/game-card";
+import { LiveRefresher } from "@/components/live-refresher";
 
 export const metadata = { title: "Calendario — Zona Roja" };
 
@@ -26,8 +27,11 @@ export default async function CalendarioPage({
     games = DEMO_GAMES.filter((g) => !selectedWeek || g.week === selectedWeek).map(demoGameToDisplay);
   }
 
+  const hasLiveGame = games.some((g) => g.status === "IN_PROGRESS");
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
+      {hasLiveGame && <LiveRefresher intervalSeconds={20} />}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-3xl">Calendario</h1>
         <form className="flex items-center gap-2">
