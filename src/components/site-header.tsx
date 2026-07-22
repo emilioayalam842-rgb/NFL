@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Session } from "next-auth";
 import { signOut } from "@/auth";
 
@@ -15,11 +16,8 @@ export function SiteHeader({ session }: { session: Session | null }) {
     <header className="sticky top-0 z-40">
       <div className="bg-navy text-chalk">
         <div className="mx-auto max-w-6xl px-4 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="inline-block h-8 w-8 bg-red" style={{ clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" }} />
-            <span className="font-display text-2xl leading-none tracking-wide">
-              Zona<span className="text-red">Roja</span>
-            </span>
+          <Link href="/" className="flex items-center shrink-0">
+            <Image src="/logo-light.png" alt="Zona Roja" width={220} height={32} priority className="h-8 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 font-display text-sm tracking-wider">
