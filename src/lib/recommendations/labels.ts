@@ -1,0 +1,6 @@
+export const RECOMMENDATION_TYPE_LABEL: Record<string, string> = {
+  SPREAD: "SPREAD",
+  MONEYLINE: "MONEYLINE",
+  TOTAL: "OVER/UNDER",
+  PLAYER_PROP: "PROP DE JUGADOR",
+};

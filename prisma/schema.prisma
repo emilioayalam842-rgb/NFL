@@ -1,0 +1,254 @@
+// Prisma schema — NFL picks & stats platform
+// docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Auth (Auth.js) ----------
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  passwordHash   String? // set only for email/password sign-up
+  role           Role      @default(USER)
+
+  // Responsible gambling: if set in the future, the user is blocked
+  // from purchasing/renewing subscriptions until this date passes.
+  selfExcludedUntil DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  paymentClaims PaymentClaim[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------- Subscriptions & payments ----------
+
+model Plan {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  priceMXN    Int // cents (e.g. 14900 = $149.00 MXN)
+  intervalDays Int    @default(30)
+  description String
+  features    String // JSON-encoded string array
+  active      Boolean @default(true)
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String
+  planId    String
+  status    SubscriptionStatus @default(PENDING)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime           @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          Plan           @relation(fields: [planId], references: [id])
+  paymentClaims PaymentClaim[]
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELED
+}
+
+model PaymentClaim {
+  id             String            @id @default(cuid())
+  userId         String
+  subscriptionId String
+  amountMXN      Int
+  claveRastreo   String
+  fechaOperacion DateTime
+  bancoEmisor    String
+  cuentaOrdenante String
+  status         PaymentClaimStatus @default(PENDING)
+  verificationMethod VerificationMethod?
+  banxicoResponse String? // raw/parsed CEP response, JSON-encoded
+  adminNote      String?
+  createdAt      DateTime          @default(now())
+  verifiedAt     DateTime?
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentClaimStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  MANUAL_REVIEW
+}
+
+enum VerificationMethod {
+  AUTO_BANXICO
+  MANUAL_ADMIN
+}
+
+// ---------- NFL data ----------
+
+model Team {
+  id            String @id @default(cuid())
+  espnId        String @unique
+  name          String
+  abbreviation  String
+  city          String
+  conference    String // AFC / NFC
+  division      String // North/South/East/West
+  colorPrimary  String
+  colorSecondary String
+  logoUrl       String?
+
+  players    Player[]
+  homeGames  Game[]   @relation("HomeTeam")
+  awayGames  Game[]   @relation("AwayTeam")
+}
+
+model Player {
+  id           String  @id @default(cuid())
+  espnId       String  @unique
+  name         String
+  position     String
+  jerseyNumber Int?
+  teamId       String?
+
+  team  Team?            @relation(fields: [teamId], references: [id])
+  stats PlayerGameStat[]
+}
+
+model Game {
+  id         String     @id @default(cuid())
+  espnId     String     @unique
+  season     Int
+  week       Int
+  seasonType Int        @default(2) // 1=pre, 2=regular, 3=post
+  homeTeamId String
+  awayTeamId String
+  homeScore  Int?
+  awayScore  Int?
+  status     GameStatus @default(SCHEDULED)
+  startTime  DateTime
+  venue      String?
+
+  // Market lines used as the baseline for the recommendation engine.
+  // Pulled from ESPN's odds feed when present, editable by an admin.
+  marketSpread Float? // negative favors home team
+  marketTotal  Float?
+
+  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+
+  stats           PlayerGameStat[]
+  recommendations Recommendation[]
+}
+
+enum GameStatus {
+  SCHEDULED
+  IN_PROGRESS
+  FINAL
+  POSTPONED
+}
+
+model PlayerGameStat {
+  id     String @id @default(cuid())
+  playerId String
+  gameId   String
+
+  passingYards   Int?
+  passingTDs     Int?
+  interceptions  Int?
+  rushingYards   Int?
+  rushingTDs     Int?
+  receptions     Int?
+  receivingYards Int?
+  receivingTDs   Int?
+  tackles        Int?
+  sacks          Float?
+  forcedFumbles  Int?
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, gameId])
+}
+
+model Recommendation {
+  id         String             @id @default(cuid())
+  gameId     String
+  type       RecommendationType
+  subject    String // team name, "Home/Away", or player name
+  line       Float? // spread number, total number, prop line
+  pick       String // e.g. "DAL -3.5", "Over 47.5", "P. Mahomes Over 275.5 yds pase"
+  odds       String? // american odds text e.g. "-110"
+  confidence Float // 0-1, model confidence score
+  rationale  String // short human-readable explanation
+  published  Boolean            @default(false)
+  createdAt  DateTime           @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+enum RecommendationType {
+  SPREAD
+  MONEYLINE
+  TOTAL
+  PLAYER_PROP
+}

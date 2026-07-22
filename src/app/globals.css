@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --color-navy: #041e42;
+  --color-navy-dark: #010e21;
+  --color-red: #d50a0a;
+  --color-red-dark: #970606;
+  --color-cream: #f4f1ea;
+  --color-cream-dim: #e8e3d6;
+  --color-ink: #14161a;
+  --color-chalk: #f9f7f2;
+
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
+}
+
+@theme inline {
+  --color-navy: var(--color-navy);
+  --color-navy-dark: var(--color-navy-dark);
+  --color-red: var(--color-red);
+  --color-red-dark: var(--color-red-dark);
+  --color-cream: var(--color-cream);
+  --color-cream-dim: var(--color-cream-dim);
+  --color-ink: var(--color-ink);
+  --color-chalk: var(--color-chalk);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-barlow);
+  --font-mono: var(--font-jetbrains);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0d12;
+    --foreground: #e8e3d6;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-ink) 6%, transparent) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.stat-num {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Angled divider used between sections instead of a straight rule —
+   a small nod to a yard-line/end-zone stripe rather than a plain <hr>. */
+.hash-divider {
+  height: 10px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-red) 0 10px,
+    transparent 10px 20px
+  );
+  opacity: 0.9;
+}
+
+.ticker-track {
+  animation: ticker 32s linear infinite;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
