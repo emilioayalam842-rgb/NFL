@@ -71,7 +71,7 @@ export interface EspnBoxscorePlayerCategory {
   name: string; // "passing" | "rushing" | "receiving" | "defensive" ...
   labels: string[];
   athletes: {
-    athlete: { id: string; displayName: string };
+    athlete: { id: string; displayName: string; position?: { abbreviation?: string } };
     stats: string[];
   }[];
 }

@@ -2,10 +2,11 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getGameSummary } from "@/lib/espn/queries";
 import { toDisplayGame } from "@/lib/espn/format";
-import { toDisplayBoxscore, categoryLabel, statSection, type TeamStatRow } from "@/lib/espn/boxscore-format";
+import { toDisplayBoxscore, statSection, type TeamStatRow } from "@/lib/espn/boxscore-format";
 import { formatAmericanOdds } from "@/lib/odds-format";
 import { LiveRefresher } from "@/components/live-refresher";
 import { MatchTabs } from "@/components/match-tabs";
+import { TeamPlayerStats } from "@/components/team-player-stats";
 import { prisma } from "@/lib/prisma";
 
 export const metadata = { title: "Partido — Zona Roja" };
@@ -146,40 +147,14 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
   );
 
   const jugadoresTab = !boxscore || boxscore.leaders.length === 0 ? (
-    <p className="text-fg/60">Sin líderes de jugadores todavía para este partido.</p>
+    <p className="text-fg/60">Sin estadísticas de jugadores todavía para este partido.</p>
   ) : (
-    <div className="grid sm:grid-cols-2 gap-6">
-      {boxscore.leaders.map((cat) => (
-        <div key={cat.category}>
-          <p className="font-display text-sm tracking-wide text-red mb-2">
-            {categoryLabel(cat.category).toUpperCase()}
-          </p>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-xs text-fg/50 mb-1">{game.away.abbr}</p>
-              {cat.away.map((p) => (
-                <p key={p.name}>
-                  {p.name} <span className="text-fg/50">{p.stats[0]}</span>
-                </p>
-              ))}
-            </div>
-            <div>
-              <p className="text-xs text-fg/50 mb-1">{game.home.abbr}</p>
-              {cat.home.map((p) => (
-                <p key={p.name}>
-                  {p.name} <span className="text-fg/50">{p.stats[0]}</span>
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+    <TeamPlayerStats homeAbbr={game.home.abbr} awayAbbr={game.away.abbr} leaders={boxscore.leaders} />
   );
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      {isLive && <LiveRefresher intervalSeconds={20} />}
+      {isLive && <LiveRefresher intervalSeconds={1} />}
 
       <div className="bg-navy text-chalk p-6 mb-8">
         <div className="flex items-center justify-between mb-4">

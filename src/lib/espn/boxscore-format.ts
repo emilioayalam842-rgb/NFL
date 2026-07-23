@@ -16,11 +16,17 @@ function leadingNumber(displayValue: string): number {
   return match ? parseFloat(match[0]) : 0;
 }
 
+export interface PlayerStatLine {
+  name: string;
+  position?: string;
+  stats: string[];
+}
+
 export interface PlayerLeaderRow {
   category: string;
   labels: string[];
-  home: { name: string; stats: string[] }[];
-  away: { name: string; stats: string[] }[];
+  home: PlayerStatLine[];
+  away: PlayerStatLine[];
 }
 
 export interface DisplayBoxscore {
@@ -68,8 +74,16 @@ export function toDisplayBoxscore(summary: EspnSummaryResponse): DisplayBoxscore
       leaders.push({
         category,
         labels: homeCat?.labels ?? awayCat?.labels ?? [],
-        home: (homeCat?.athletes ?? []).slice(0, 3).map((a) => ({ name: a.athlete.displayName, stats: a.stats })),
-        away: (awayCat?.athletes ?? []).slice(0, 3).map((a) => ({ name: a.athlete.displayName, stats: a.stats })),
+        home: (homeCat?.athletes ?? []).map((a) => ({
+          name: a.athlete.displayName,
+          position: a.athlete.position?.abbreviation,
+          stats: a.stats,
+        })),
+        away: (awayCat?.athletes ?? []).map((a) => ({
+          name: a.athlete.displayName,
+          position: a.athlete.position?.abbreviation,
+          stats: a.stats,
+        })),
       });
     }
   }
