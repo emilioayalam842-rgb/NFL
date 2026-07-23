@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatAmericanOdds } from "@/lib/odds-format";
+import { LiveRefresher } from "@/components/live-refresher";
 
 export const metadata = { title: "Momios — Zona Roja" };
 
@@ -21,11 +22,19 @@ export default async function MomiosPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl mb-2">Momios</h1>
+      <LiveRefresher intervalSeconds={15} />
+
+      <div className="flex items-center gap-2 mb-2">
+        <h1 className="text-3xl">Momios</h1>
+        <span className="flex items-center gap-1.5 text-xs font-display tracking-wide text-fg/50">
+          <span className="h-1.5 w-1.5 rounded-full bg-red animate-pulse" />
+          EN VIVO
+        </span>
+      </div>
       <p className="text-fg/60 mb-8 max-w-2xl">
         Líneas y precios de casas de apuestas mexicanas, capturados y actualizados a mano por
-        nuestro equipo. Los momios pueden cambiar en la casa real antes de que apuestes —
-        confírmalos ahí antes de tirar tu dinero.
+        nuestro equipo, y refrescados en esta página automáticamente. Los momios pueden cambiar en
+        la casa real antes de que apuestes — confírmalos ahí antes de tirar tu dinero.
       </p>
 
       {games.length === 0 ? (

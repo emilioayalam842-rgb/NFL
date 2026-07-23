@@ -155,6 +155,7 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       {isLive && <LiveRefresher intervalSeconds={1} />}
+      {!isLive && oddsBadges.length > 0 && <LiveRefresher intervalSeconds={15} />}
 
       <div className="bg-navy text-chalk p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
