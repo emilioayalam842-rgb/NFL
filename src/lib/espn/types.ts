@@ -92,6 +92,11 @@ export interface EspnBoxscoreTeamStats {
   statistics: EspnBoxscoreTeamStat[];
 }
 
+export interface EspnWinProbabilityEntry {
+  homeWinPercentage: number; // 0-1
+  secondsLeft?: number;
+}
+
 export interface EspnSummaryResponse {
   boxscore?: {
     teams?: EspnBoxscoreTeamStats[];
@@ -100,4 +105,7 @@ export interface EspnSummaryResponse {
   header?: {
     competitions: EspnCompetition[];
   };
+  // ESPN appends one entry per play as the game progresses — the last one is
+  // the current in-game win probability.
+  winprobability?: EspnWinProbabilityEntry[];
 }

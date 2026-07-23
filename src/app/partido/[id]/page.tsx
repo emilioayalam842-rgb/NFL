@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getGameSummary } from "@/lib/espn/queries";
 import { toDisplayGame } from "@/lib/espn/format";
 import { toDisplayBoxscore, statSection, type TeamStatRow } from "@/lib/espn/boxscore-format";
+import { liveWinProbability, impliedMoneyline } from "@/lib/espn/live-odds";
 import { formatAmericanOdds } from "@/lib/odds-format";
 import { LiveRefresher } from "@/components/live-refresher";
 import { MatchTabs } from "@/components/match-tabs";
@@ -49,6 +50,7 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
 
   const boxscore = toDisplayBoxscore(summary);
   const isLive = game.status === "IN_PROGRESS";
+  const liveProb = isLive ? liveWinProbability(summary) : null;
 
   const dbGame = await prisma.game.findUnique({
     where: { espnId: id },
@@ -74,6 +76,34 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
   const resumenTab = (
     <div>
       {game.venue && <p className="text-sm text-fg/60 mb-4">{game.venue}</p>}
+
+      {liveProb && (
+        <div className="mb-6">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-red animate-pulse" />
+            <p className="font-display text-sm tracking-wide text-red">MOMIO EN VIVO (MODELO ZONA ROJA)</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="border border-fg/10 bg-surface p-3">
+              <p className="text-xs text-fg/50">{game.away.abbr} gana</p>
+              <p className="stat-num text-lg font-semibold">
+                {(liveProb.away * 100).toFixed(0)}% · {formatAmericanOdds(impliedMoneyline(liveProb.away))}
+              </p>
+            </div>
+            <div className="border border-fg/10 bg-surface p-3 text-right">
+              <p className="text-xs text-fg/50">{game.home.abbr} gana</p>
+              <p className="stat-num text-lg font-semibold">
+                {(liveProb.home * 100).toFixed(0)}% · {formatAmericanOdds(impliedMoneyline(liveProb.home))}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-fg/40 mt-2">
+            Estimado por nuestro modelo a partir de la jugada más reciente — se actualiza solo cada
+            segundo. No es el momio de ninguna casa de apuestas; confirma el precio real ahí antes
+            de apostar.
+          </p>
+        </div>
+      )}
 
       {oddsBadges.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
