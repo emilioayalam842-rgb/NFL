@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/prisma";
-import { syncTeamsAction, syncScoreboardAction, updateGameLines, generateRecsAction } from "../actions";
+import {
+  syncTeamsAction,
+  syncScoreboardAction,
+  syncPlayerStatsAction,
+  syncAllPlayerStatsAction,
+  updateGameLines,
+  generateRecsAction,
+} from "../actions";
 
 export default async function AdminJuegosPage() {
   const games = await prisma.game.findMany({
-    include: { homeTeam: true, awayTeam: true },
+    include: { homeTeam: true, awayTeam: true, _count: { select: { stats: true } } },
     orderBy: { startTime: "desc" },
     take: 30,
   });
@@ -22,6 +29,11 @@ export default async function AdminJuegosPage() {
             Sincronizar calendario (semana actual)
           </button>
         </form>
+        <form action={async () => { "use server"; await syncAllPlayerStatsAction(); }}>
+          <button className="bg-red text-chalk px-4 py-2 text-sm font-display tracking-wide">
+            Importar stats de jugadores (juegos finalizados)
+          </button>
+        </form>
         <p className="text-xs text-fg/50 max-w-md">
           Trae datos de ESPN. Requiere que el entorno donde corre la app tenga salida a internet
           (no siempre disponible en sandboxes de desarrollo).
@@ -37,7 +49,8 @@ export default async function AdminJuegosPage() {
                 {g.awayTeam.abbreviation} @ {g.homeTeam.abbreviation}
               </p>
               <p className="text-xs text-fg/50">
-                Semana {g.week} · {g.status} · {g.startTime.toLocaleDateString("es-MX")}
+                Semana {g.week} · {g.status} · {g.startTime.toLocaleDateString("es-MX")} ·{" "}
+                {g._count.stats} líneas de stats
               </p>
             </div>
 
@@ -72,6 +85,14 @@ export default async function AdminJuegosPage() {
               />
               <button className="border border-fg/20 px-3 py-1.5 hover:border-navy">Guardar líneas</button>
             </form>
+
+            {g.status === "FINAL" && (
+              <form action={async () => { "use server"; await syncPlayerStatsAction(g.id); }}>
+                <button className="border border-fg/20 px-3 py-1.5 text-sm hover:border-navy">
+                  Importar stats
+                </button>
+              </form>
+            )}
 
             <form action={async () => { "use server"; await generateRecsAction(g.id); }}>
               <button className="bg-red text-chalk px-3 py-1.5 text-sm font-display tracking-wide">

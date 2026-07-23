@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { verifyPaymentClaim, resolveClaimManually } from "@/lib/banxico/verify-claim";
 import { syncTeams, syncScoreboard } from "@/lib/espn/sync";
+import { syncPlayerStatsForGame, syncPlayerStatsForFinishedGames } from "@/lib/espn/sync-player-stats";
 import { generateRecommendationsForGame } from "@/lib/recommendations/generate";
 
 async function requireAdmin() {
@@ -45,6 +46,20 @@ export async function syncTeamsAction() {
 export async function syncScoreboardAction(week?: number) {
   await requireAdmin();
   const result = await syncScoreboard({ week });
+  revalidatePath("/admin/juegos");
+  return result;
+}
+
+export async function syncPlayerStatsAction(gameId: string) {
+  await requireAdmin();
+  const result = await syncPlayerStatsForGame(gameId);
+  revalidatePath("/admin/juegos");
+  return result;
+}
+
+export async function syncAllPlayerStatsAction() {
+  await requireAdmin();
+  const result = await syncPlayerStatsForFinishedGames();
   revalidatePath("/admin/juegos");
   return result;
 }
