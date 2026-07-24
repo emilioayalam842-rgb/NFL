@@ -45,6 +45,13 @@ export function SiteHeader({ session }: { session: Session | null }) {
           </nav>
 
           <div className="flex items-center gap-3 shrink-0">
+            <form action="/buscar" className="hidden lg:block">
+              <input
+                name="q"
+                placeholder="Buscar equipo o jugador..."
+                className="bg-navy-dark text-chalk placeholder:text-chalk/40 text-sm px-3 py-1.5 w-48 focus:w-64 transition-all border border-chalk/10 focus:border-red outline-none"
+              />
+            </form>
             <ThemeToggle />
             {session?.user ? (
               <>
@@ -72,6 +79,9 @@ export function SiteHeader({ session }: { session: Session | null }) {
         </div>
       </div>
       <nav className="md:hidden flex items-center gap-4 overflow-x-auto bg-navy-dark text-chalk px-4 py-2 font-display text-xs tracking-wider">
+        <Link href="/buscar" className="whitespace-nowrap hover:text-red transition-colors">
+          Buscar
+        </Link>
         {NAV_LINKS.map((link) => (
           <Link key={link.href} href={link.href} className="whitespace-nowrap hover:text-red transition-colors">
             {link.label}

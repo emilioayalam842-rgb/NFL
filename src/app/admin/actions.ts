@@ -156,3 +156,33 @@ export async function deletePlayerProp(propId: string) {
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
+
+export async function addGameOddsQuote(gameId: string, formData: FormData) {
+  await requireAdmin();
+  const source = String(formData.get("source") ?? "").trim();
+  if (!source) throw new Error("Falta la casa de apuestas.");
+
+  await prisma.gameOddsQuote.create({
+    data: {
+      gameId,
+      source,
+      marketSpread: parseLine(formData.get("marketSpread")),
+      marketTotal: parseLine(formData.get("marketTotal")),
+      spreadHomeOdds: parseOdds(formData.get("spreadHomeOdds")),
+      spreadAwayOdds: parseOdds(formData.get("spreadAwayOdds")),
+      totalOverOdds: parseOdds(formData.get("totalOverOdds")),
+      totalUnderOdds: parseOdds(formData.get("totalUnderOdds")),
+      moneylineHomeOdds: parseOdds(formData.get("moneylineHomeOdds")),
+      moneylineAwayOdds: parseOdds(formData.get("moneylineAwayOdds")),
+    },
+  });
+  revalidatePath("/admin/momios");
+  revalidatePath("/momios");
+}
+
+export async function deleteGameOddsQuote(quoteId: string) {
+  await requireAdmin();
+  await prisma.gameOddsQuote.delete({ where: { id: quoteId } });
+  revalidatePath("/admin/momios");
+  revalidatePath("/momios");
+}

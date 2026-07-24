@@ -15,7 +15,12 @@ export default async function MomiosPage() {
         { playerProps: { some: {} } },
       ],
     },
-    include: { homeTeam: true, awayTeam: true, playerProps: true },
+    include: {
+      homeTeam: true,
+      awayTeam: true,
+      playerProps: true,
+      oddsQuotes: { orderBy: { capturedAt: "desc" } },
+    },
     orderBy: { startTime: "asc" },
     take: 30,
   });
@@ -108,6 +113,34 @@ export default async function MomiosPage() {
                   Fuente: {g.oddsSource}
                   {g.oddsUpdatedAt && ` · actualizado ${g.oddsUpdatedAt.toLocaleString("es-MX")}`}
                 </p>
+              )}
+
+              {g.oddsQuotes.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-fg/10">
+                  <p className="text-xs font-display tracking-wide text-fg/50 mb-2">COMPARA OTRAS CASAS</p>
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-fg/50">
+                        <th className="py-1 font-normal">Casa</th>
+                        <th className="py-1 font-normal text-right">Spread</th>
+                        <th className="py-1 font-normal text-right">Total</th>
+                        <th className="py-1 font-normal text-right">ML vis/local</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {g.oddsQuotes.map((q) => (
+                        <tr key={q.id} className="border-t border-fg/10">
+                          <td className="py-1.5 font-semibold">{q.source}</td>
+                          <td className="py-1.5 text-right stat-num">{q.marketSpread ?? "—"}</td>
+                          <td className="py-1.5 text-right stat-num">{q.marketTotal ?? "—"}</td>
+                          <td className="py-1.5 text-right stat-num">
+                            {formatAmericanOdds(q.moneylineAwayOdds)}/{formatAmericanOdds(q.moneylineHomeOdds)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           ))}
