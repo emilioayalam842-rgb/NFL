@@ -7,6 +7,7 @@ const ADMIN_NAV = [
   { href: "/admin/juegos", label: "Juegos" },
   { href: "/admin/momios", label: "Momios" },
   { href: "/admin/recomendaciones", label: "Picks" },
+  { href: "/admin/auditoria", label: "Auditoría" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

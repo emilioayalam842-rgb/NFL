@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Session } from "next-auth";
 import { signOut } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 
 const NAV_LINKS = [
   { href: "/calendario", label: "Calendario" },
@@ -14,7 +16,17 @@ const NAV_LINKS = [
   { href: "/planes", label: "Planes" },
 ];
 
-export function SiteHeader({ session }: { session: Session | null }) {
+export async function SiteHeader({ session }: { session: Session | null }) {
+  const notifications = session?.user
+    ? (
+        await prisma.notification.findMany({
+          where: { userId: session.user.id },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+        })
+      ).map((n) => ({ ...n, createdAt: n.createdAt.toISOString() }))
+    : [];
+
   return (
     <header className="sticky top-0 z-40">
       <div className="bg-navy text-chalk">
@@ -53,6 +65,7 @@ export function SiteHeader({ session }: { session: Session | null }) {
               />
             </form>
             <ThemeToggle />
+            {session?.user && <NotificationBell notifications={notifications} />}
             {session?.user ? (
               <>
                 <Link

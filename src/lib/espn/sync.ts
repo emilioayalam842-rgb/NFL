@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getScoreboard, getTeams } from "./queries";
+import { notifyFavoriteTeamFollowers } from "@/lib/notifications";
 
 /** Upserts every current NFL team from ESPN into the local Team table. */
 export async function syncTeams() {
@@ -38,7 +39,9 @@ export async function syncTeams() {
   return { synced, ok: true as const };
 }
 
-/** Upserts games for a given week/season into the local Game table. */
+/** Upserts games for a given week/season into the local Game table.
+ * Also notifies followers of either team the first time a game flips to
+ * IN_PROGRESS. */
 export async function syncScoreboard(opts: { week?: number; seasonType?: number; year?: number } = {}) {
   const data = await getScoreboard(opts);
   if (!data) return { synced: 0, ok: false as const };
@@ -55,6 +58,8 @@ export async function syncScoreboard(opts: { week?: number; seasonType?: number;
     const homeTeam = await prisma.team.findUnique({ where: { espnId: home.team.id } });
     const awayTeam = await prisma.team.findUnique({ where: { espnId: away.team.id } });
     if (!homeTeam || !awayTeam) continue; // run syncTeams() first
+
+    const previous = await prisma.game.findUnique({ where: { espnId: event.id }, select: { status: true } });
 
     const status =
       competition.status.type.state === "post"
@@ -91,6 +96,14 @@ export async function syncScoreboard(opts: { week?: number; seasonType?: number;
       },
     });
     synced += 1;
+
+    if (previous && previous.status !== "IN_PROGRESS" && status === "IN_PROGRESS") {
+      await notifyFavoriteTeamFollowers(
+        [homeTeam.id, awayTeam.id],
+        `${away.team.abbreviation} @ ${home.team.abbreviation} ya empezó`,
+        `/partido/${event.id}`
+      );
+    }
   }
 
   return { synced, ok: true as const };

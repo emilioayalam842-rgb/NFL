@@ -7,6 +7,8 @@ import { verifyPaymentClaim, resolveClaimManually } from "@/lib/banxico/verify-c
 import { syncTeams, syncScoreboard } from "@/lib/espn/sync";
 import { syncPlayerStatsForGame, syncPlayerStatsForFinishedGames } from "@/lib/espn/sync-player-stats";
 import { generateRecommendationsForGame, generateRecommendationsForWeek } from "@/lib/recommendations/generate";
+import { notifyFavoriteTeamFollowers } from "@/lib/notifications";
+import { logAudit } from "@/lib/audit";
 
 async function requireAdmin() {
   const session = await auth();
@@ -88,8 +90,18 @@ export async function generateRecsForWeekAction(week: number) {
 
 export async function togglePublished(recId: string) {
   await requireAdmin();
-  const rec = await prisma.recommendation.findUniqueOrThrow({ where: { id: recId } });
-  await prisma.recommendation.update({ where: { id: recId }, data: { published: !rec.published } });
+  const rec = await prisma.recommendation.findUniqueOrThrow({ where: { id: recId }, include: { game: true } });
+  const nextPublished = !rec.published;
+  await prisma.recommendation.update({ where: { id: recId }, data: { published: nextPublished } });
+
+  if (nextPublished) {
+    await notifyFavoriteTeamFollowers(
+      [rec.game.homeTeamId, rec.game.awayTeamId],
+      `Nuevo pick: ${rec.pick}`,
+      `/partido/${rec.game.espnId}`
+    );
+  }
+
   revalidatePath("/admin/recomendaciones");
 }
 
@@ -106,28 +118,42 @@ function parseLine(value: FormDataEntryValue | null): number | null {
 }
 
 export async function updateGameOdds(gameId: string, formData: FormData) {
-  await requireAdmin();
+  const session = await requireAdmin();
+  const marketSpread = parseLine(formData.get("marketSpread"));
+  const marketTotal = parseLine(formData.get("marketTotal"));
+  const moneylineHomeOdds = parseOdds(formData.get("moneylineHomeOdds"));
+  const moneylineAwayOdds = parseOdds(formData.get("moneylineAwayOdds"));
+
   await prisma.game.update({
     where: { id: gameId },
     data: {
-      marketSpread: parseLine(formData.get("marketSpread")),
-      marketTotal: parseLine(formData.get("marketTotal")),
+      marketSpread,
+      marketTotal,
       spreadHomeOdds: parseOdds(formData.get("spreadHomeOdds")),
       spreadAwayOdds: parseOdds(formData.get("spreadAwayOdds")),
       totalOverOdds: parseOdds(formData.get("totalOverOdds")),
       totalUnderOdds: parseOdds(formData.get("totalUnderOdds")),
-      moneylineHomeOdds: parseOdds(formData.get("moneylineHomeOdds")),
-      moneylineAwayOdds: parseOdds(formData.get("moneylineAwayOdds")),
+      moneylineHomeOdds,
+      moneylineAwayOdds,
       oddsSource: (formData.get("oddsSource") as string) || null,
       oddsUpdatedAt: new Date(),
     },
   });
+
+  await logAudit(
+    session!.user.id,
+    "update_game_odds",
+    "Game",
+    gameId,
+    `spread ${marketSpread ?? "—"}, total ${marketTotal ?? "—"}, ML ${moneylineAwayOdds ?? "—"}/${moneylineHomeOdds ?? "—"}`
+  );
+
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
 
 export async function addPlayerProp(gameId: string, formData: FormData) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const playerName = String(formData.get("playerName") ?? "").trim();
   const statLabel = String(formData.get("statLabel") ?? "").trim();
   const line = parseLine(formData.get("line"));
@@ -135,7 +161,7 @@ export async function addPlayerProp(gameId: string, formData: FormData) {
     throw new Error("Falta jugador, estadística o línea.");
   }
 
-  await prisma.playerPropLine.create({
+  const prop = await prisma.playerPropLine.create({
     data: {
       gameId,
       playerName,
@@ -146,23 +172,27 @@ export async function addPlayerProp(gameId: string, formData: FormData) {
       oddsSource: (formData.get("oddsSource") as string) || null,
     },
   });
+
+  await logAudit(session!.user.id, "add_player_prop", "PlayerPropLine", prop.id, `${playerName} — ${statLabel} ${line}`);
+
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
 
 export async function deletePlayerProp(propId: string) {
-  await requireAdmin();
+  const session = await requireAdmin();
   await prisma.playerPropLine.delete({ where: { id: propId } });
+  await logAudit(session!.user.id, "delete_player_prop", "PlayerPropLine", propId);
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
 
 export async function addGameOddsQuote(gameId: string, formData: FormData) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const source = String(formData.get("source") ?? "").trim();
   if (!source) throw new Error("Falta la casa de apuestas.");
 
-  await prisma.gameOddsQuote.create({
+  const quote = await prisma.gameOddsQuote.create({
     data: {
       gameId,
       source,
@@ -176,13 +206,17 @@ export async function addGameOddsQuote(gameId: string, formData: FormData) {
       moneylineAwayOdds: parseOdds(formData.get("moneylineAwayOdds")),
     },
   });
+
+  await logAudit(session!.user.id, "add_odds_quote", "GameOddsQuote", quote.id, source);
+
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
 
 export async function deleteGameOddsQuote(quoteId: string) {
-  await requireAdmin();
+  const session = await requireAdmin();
   await prisma.gameOddsQuote.delete({ where: { id: quoteId } });
+  await logAudit(session!.user.id, "delete_odds_quote", "GameOddsQuote", quoteId);
   revalidatePath("/admin/momios");
   revalidatePath("/momios");
 }
