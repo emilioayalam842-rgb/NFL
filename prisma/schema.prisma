@@ -13,13 +13,13 @@ datasource db {
 // ---------- Auth (Auth.js) ----------
 
 model User {
-  id             String    @id @default(cuid())
-  name           String?
-  email          String    @unique
-  emailVerified  DateTime?
-  image          String?
-  passwordHash   String? // set only for email/password sign-up
-  role           Role      @default(USER)
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String? // set only for email/password sign-up
+  role          Role      @default(USER)
 
   // Responsible gambling: if set in the future, the user is blocked
   // from purchasing/renewing subscriptions until this date passes.
@@ -32,6 +32,10 @@ model User {
   sessions      Session[]
   subscriptions Subscription[]
   paymentClaims PaymentClaim[]
+  savedPicks    SavedPick[]
+  favoriteTeams FavoriteTeam[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
 }
 
 enum Role {
@@ -78,14 +82,14 @@ model VerificationToken {
 // ---------- Subscriptions & payments ----------
 
 model Plan {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  name        String
-  priceMXN    Int // cents (e.g. 14900 = $149.00 MXN)
-  intervalDays Int    @default(30)
-  description String
-  features    String // JSON-encoded string array
-  active      Boolean @default(true)
+  id           String  @id @default(cuid())
+  slug         String  @unique
+  name         String
+  priceMXN     Int // cents (e.g. 14900 = $149.00 MXN)
+  intervalDays Int     @default(30)
+  description  String
+  features     String // JSON-encoded string array
+  active       Boolean @default(true)
 
   subscriptions Subscription[]
 }
@@ -112,20 +116,20 @@ enum SubscriptionStatus {
 }
 
 model PaymentClaim {
-  id             String            @id @default(cuid())
-  userId         String
-  subscriptionId String
-  amountMXN      Int
-  claveRastreo   String
-  fechaOperacion DateTime
-  bancoEmisor    String
-  cuentaOrdenante String
-  status         PaymentClaimStatus @default(PENDING)
+  id                 String              @id @default(cuid())
+  userId             String
+  subscriptionId     String
+  amountMXN          Int
+  claveRastreo       String
+  fechaOperacion     DateTime
+  bancoEmisor        String
+  cuentaOrdenante    String
+  status             PaymentClaimStatus  @default(PENDING)
   verificationMethod VerificationMethod?
-  banxicoResponse String? // raw/parsed CEP response, JSON-encoded
-  adminNote      String?
-  createdAt      DateTime          @default(now())
-  verifiedAt     DateTime?
+  banxicoResponse    String? // raw/parsed CEP response, JSON-encoded
+  adminNote          String?
+  createdAt          DateTime            @default(now())
+  verifiedAt         DateTime?
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
@@ -146,20 +150,21 @@ enum VerificationMethod {
 // ---------- NFL data ----------
 
 model Team {
-  id            String @id @default(cuid())
-  espnId        String @unique
-  name          String
-  abbreviation  String
-  city          String
-  conference    String // AFC / NFC
-  division      String // North/South/East/West
-  colorPrimary  String
+  id             String  @id @default(cuid())
+  espnId         String  @unique
+  name           String
+  abbreviation   String
+  city           String
+  conference     String // AFC / NFC
+  division       String // North/South/East/West
+  colorPrimary   String
   colorSecondary String
-  logoUrl       String?
+  logoUrl        String?
 
-  players    Player[]
-  homeGames  Game[]   @relation("HomeTeam")
-  awayGames  Game[]   @relation("AwayTeam")
+  players     Player[]
+  homeGames   Game[]         @relation("HomeTeam")
+  awayGames   Game[]         @relation("AwayTeam")
+  favoritedBy FavoriteTeam[]
 }
 
 model Player {
@@ -211,6 +216,7 @@ model Game {
   stats           PlayerGameStat[]
   recommendations Recommendation[]
   playerProps     PlayerPropLine[]
+  oddsQuotes      GameOddsQuote[]
 }
 
 enum GameStatus {
@@ -221,7 +227,7 @@ enum GameStatus {
 }
 
 model PlayerGameStat {
-  id     String @id @default(cuid())
+  id       String @id @default(cuid())
   playerId String
   gameId   String
 
@@ -256,7 +262,8 @@ model Recommendation {
   published  Boolean            @default(false)
   createdAt  DateTime           @default(now())
 
-  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game    Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  savedBy SavedPick[]
 }
 
 enum RecommendationType {
@@ -282,4 +289,79 @@ model PlayerPropLine {
   updatedAt  DateTime @updatedAt
 
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+// A pick a user bookmarked from /recomendaciones to find again later.
+model SavedPick {
+  id               String   @id @default(cuid())
+  userId           String
+  recommendationId String
+  createdAt        DateTime @default(now())
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendation Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recommendationId])
+}
+
+// A team a user follows, used to personalize /cuenta and to target
+// notifications ("tu equipo juega hoy", "nuevo pick para tu equipo").
+model FavoriteTeam {
+  id        String   @id @default(cuid())
+  userId    String
+  teamId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, teamId])
+}
+
+// A momio capturado a mano de una casa específica. Independiente de los
+// campos de momios en Game (que son la línea "oficial" que alimenta al
+// motor de picks) — esto permite comparar varias casas lado a lado.
+model GameOddsQuote {
+  id                String   @id @default(cuid())
+  gameId            String
+  source            String // ej. "PlayDoit", "Caliente"
+  marketSpread      Float?
+  marketTotal       Float?
+  spreadHomeOdds    Int?
+  spreadAwayOdds    Int?
+  totalOverOdds     Int?
+  totalUnderOdds    Int?
+  moneylineHomeOdds Int?
+  moneylineAwayOdds Int?
+  capturedAt        DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+// In-app notification: pick publicado o partido de un equipo favorito que
+// empieza. Sin infraestructura de email/push todavía — esto es el feed que
+// se muestra en la campanita del header.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Quién capturó/editó qué momio o prop y cuándo, para poder auditar el panel
+// de admin (varias personas podrían tener acceso).
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String // ej. "update_game_odds", "add_player_prop"
+  entityType String // ej. "Game", "PlayerPropLine"
+  entityId   String
+  detail     String? // texto corto legible, ej. "spread -3.5, ML -150/+130"
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

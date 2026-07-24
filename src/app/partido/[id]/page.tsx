@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGameSummary } from "@/lib/espn/queries";
 import { toDisplayGame } from "@/lib/espn/format";
@@ -61,6 +62,22 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
       recommendations: { where: { published: true } },
     },
   });
+
+  const headToHead = dbGame
+    ? await prisma.game.findMany({
+        where: {
+          status: "FINAL",
+          id: { not: dbGame.id },
+          OR: [
+            { homeTeamId: dbGame.homeTeamId, awayTeamId: dbGame.awayTeamId },
+            { homeTeamId: dbGame.awayTeamId, awayTeamId: dbGame.homeTeamId },
+          ],
+        },
+        include: { homeTeam: true, awayTeam: true },
+        orderBy: { startTime: "desc" },
+        take: 5,
+      })
+    : [];
 
   const oddsBadges: string[] = [];
   if (dbGame?.marketSpread != null) {
@@ -149,6 +166,26 @@ export default async function PartidoPage({ params }: { params: Promise<{ id: st
 
       {oddsBadges.length === 0 && !dbGame?.recommendations.length && !dbGame?.playerProps.length && (
         <p className="text-fg/60 text-sm">Sin momios ni picks capturados para este partido todavía.</p>
+      )}
+
+      {headToHead.length > 0 && (
+        <div className="mt-8">
+          <p className="font-display text-sm tracking-wide text-red mb-3">ENFRENTAMIENTOS ANTERIORES</p>
+          <div className="space-y-1.5 text-sm">
+            {headToHead.map((g) => (
+              <Link
+                key={g.id}
+                href={`/partido/${g.espnId}`}
+                className="flex items-center justify-between border border-fg/10 bg-surface px-4 py-2.5 hover:border-red transition-colors"
+              >
+                <span className="text-xs text-fg/50">{g.startTime.toLocaleDateString("es-MX")}</span>
+                <span className="font-display">
+                  {g.awayTeam.abbreviation} {g.awayScore} @ {g.homeTeam.abbreviation} {g.homeScore}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

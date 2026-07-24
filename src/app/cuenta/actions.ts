@@ -17,3 +17,33 @@ export async function setSelfExclusion(days: number) {
 
   revalidatePath("/cuenta");
 }
+
+export async function toggleFavoriteTeam(teamId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("No autenticado.");
+
+  const existing = await prisma.favoriteTeam.findUnique({
+    where: { userId_teamId: { userId: session.user.id, teamId } },
+  });
+
+  if (existing) {
+    await prisma.favoriteTeam.delete({ where: { id: existing.id } });
+  } else {
+    await prisma.favoriteTeam.create({ data: { userId: session.user.id, teamId } });
+  }
+
+  revalidatePath("/cuenta");
+  revalidatePath(`/equipo/${teamId}`);
+}
+
+export async function removeSavedPick(recommendationId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("No autenticado.");
+
+  await prisma.savedPick.deleteMany({
+    where: { userId: session.user.id, recommendationId },
+  });
+
+  revalidatePath("/cuenta");
+  revalidatePath("/recomendaciones");
+}

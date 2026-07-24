@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/calendario", label: "Calendario" },
   { href: "/resultados", label: "Resultados" },
   { href: "/estadisticas", label: "Estadísticas" },
+  { href: "/lideres", label: "Líderes" },
   { href: "/momios", label: "Momios" },
   { href: "/recomendaciones", label: "Picks" },
   { href: "/planes", label: "Planes" },

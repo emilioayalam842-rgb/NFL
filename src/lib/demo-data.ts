@@ -69,7 +69,9 @@ export const DEMO_GAMES: DemoGame[] = [
 
 export interface DemoPlayerStat {
   player: string;
+  playerId?: string;
   team: string;
+  teamId?: string;
   position: string;
   week: number;
   passingYards?: number;

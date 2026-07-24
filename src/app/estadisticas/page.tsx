@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DEMO_PLAYER_STATS } from "@/lib/demo-data";
 
@@ -22,7 +23,9 @@ export default async function EstadisticasPage() {
     dbStats.length > 0
       ? dbStats.map((s) => ({
           player: s.player.name,
+          playerId: s.player.id,
           team: s.player.team?.abbreviation ?? "—",
+          teamId: s.player.team?.id,
           position: s.player.position,
           week: s.game.week,
           passingYards: s.passingYards ?? undefined,
@@ -60,8 +63,24 @@ export default async function EstadisticasPage() {
           <tbody>
             {rows.map((r, i) => (
               <tr key={i} className={i % 2 ? "bg-surface" : "bg-surface-alt"}>
-                <td className="px-4 py-2 font-semibold">{r.player}</td>
-                <td className="px-4 py-2">{r.team}</td>
+                <td className="px-4 py-2 font-semibold">
+                  {r.playerId ? (
+                    <Link href={`/jugador/${r.playerId}`} className="hover:text-red transition-colors">
+                      {r.player}
+                    </Link>
+                  ) : (
+                    r.player
+                  )}
+                </td>
+                <td className="px-4 py-2">
+                  {r.teamId ? (
+                    <Link href={`/equipo/${r.teamId}`} className="hover:text-red transition-colors">
+                      {r.team}
+                    </Link>
+                  ) : (
+                    r.team
+                  )}
+                </td>
                 <td className="px-4 py-2">{r.position}</td>
                 <td className="px-4 py-2 stat-num">{r.week}</td>
                 {STAT_COLUMNS.map((c) => (

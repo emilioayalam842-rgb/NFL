@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { setSelfExclusion } from "./actions";
+import { setSelfExclusion, toggleFavoriteTeam, removeSavedPick } from "./actions";
 
 export const metadata = { title: "Mi cuenta — Zona Roja" };
 
@@ -11,11 +12,26 @@ export default async function CuentaPage({
 }) {
   const { excluido } = await searchParams;
   const session = await auth();
-  const user = await prisma.user.findUnique({ where: { id: session!.user.id } });
+  const userId = session!.user.id;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
 
   const subscriptions = await prisma.subscription.findMany({
-    where: { userId: session!.user.id },
+    where: { userId },
     include: { plan: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const favoriteTeams = await prisma.favoriteTeam.findMany({
+    where: { userId },
+    include: { team: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const savedPicks = await prisma.savedPick.findMany({
+    where: { userId },
+    include: {
+      recommendation: { include: { game: { include: { homeTeam: true, awayTeam: true } } } },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -42,6 +58,55 @@ export default async function CuentaPage({
               <li key={s.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
                 <span>{s.plan.name}</span>
                 <span className="font-semibold">{s.status}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-display text-xl mb-4">Mis equipos</h2>
+        {favoriteTeams.length === 0 ? (
+          <p className="text-fg/60">
+            No sigues ningún equipo todavía — visita la página de un equipo y dale &ldquo;Seguir
+            equipo&rdquo;.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {favoriteTeams.map((f) => (
+              <li key={f.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
+                <Link href={`/equipo/${f.team.id}`} className="font-semibold hover:text-red transition-colors">
+                  {f.team.city} {f.team.name}
+                </Link>
+                <form action={async () => { "use server"; await toggleFavoriteTeam(f.team.id); }}>
+                  <button className="text-xs text-fg/50 hover:text-fg">Dejar de seguir</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-display text-xl mb-4">Picks guardados</h2>
+        {savedPicks.length === 0 ? (
+          <p className="text-fg/60">
+            No has guardado ningún pick — desde &ldquo;Picks&rdquo; dale &ldquo;Guardar pick&rdquo; a
+            los que quieras encontrar rápido después.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {savedPicks.map((s) => (
+              <li key={s.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between gap-3 text-sm">
+                <div>
+                  <p className="font-display">{s.recommendation.pick}</p>
+                  <p className="text-xs text-fg/50">
+                    {s.recommendation.game.awayTeam.abbreviation} @ {s.recommendation.game.homeTeam.abbreviation}
+                  </p>
+                </div>
+                <form action={async () => { "use server"; await removeSavedPick(s.recommendationId); }}>
+                  <button className="text-xs text-fg/50 hover:text-fg shrink-0">Quitar</button>
+                </form>
               </li>
             ))}
           </ul>

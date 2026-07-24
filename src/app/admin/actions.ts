@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPaymentClaim, resolveClaimManually } from "@/lib/banxico/verify-claim";
 import { syncTeams, syncScoreboard } from "@/lib/espn/sync";
 import { syncPlayerStatsForGame, syncPlayerStatsForFinishedGames } from "@/lib/espn/sync-player-stats";
-import { generateRecommendationsForGame } from "@/lib/recommendations/generate";
+import { generateRecommendationsForGame, generateRecommendationsForWeek } from "@/lib/recommendations/generate";
 
 async function requireAdmin() {
   const session = await auth();
@@ -77,6 +77,13 @@ export async function generateRecsAction(gameId: string) {
   await requireAdmin();
   await generateRecommendationsForGame(gameId);
   revalidatePath("/admin/recomendaciones");
+}
+
+export async function generateRecsForWeekAction(week: number) {
+  await requireAdmin();
+  const result = await generateRecommendationsForWeek(week);
+  revalidatePath("/admin/recomendaciones");
+  return result;
 }
 
 export async function togglePublished(recId: string) {

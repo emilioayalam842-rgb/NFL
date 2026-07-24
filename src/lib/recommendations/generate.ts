@@ -134,3 +134,25 @@ export async function generateRecommendationsForGame(gameId: string) {
 
   return created;
 }
+
+/**
+ * Runs generateRecommendationsForGame for every game in a week that doesn't
+ * already have any recommendations, so an admin doesn't have to click
+ * "Generar picks" one game at a time.
+ */
+export async function generateRecommendationsForWeek(week: number) {
+  const games = await prisma.game.findMany({
+    where: { week, status: { not: "FINAL" }, recommendations: { none: {} } },
+    select: { id: true },
+  });
+
+  let gamesProcessed = 0;
+  let picksCreated = 0;
+  for (const g of games) {
+    const created = await generateRecommendationsForGame(g.id);
+    gamesProcessed += 1;
+    picksCreated += created.length;
+  }
+
+  return { gamesProcessed, picksCreated };
+}
