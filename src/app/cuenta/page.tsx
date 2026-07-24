@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateReferralCode } from "@/lib/referral";
 import { setSelfExclusion, toggleFavoriteTeam, removeSavedPick } from "./actions";
 
 export const metadata = { title: "Mi cuenta — Zona Roja" };
+
+const PAYMENT_STATUS_LABEL: Record<string, string> = {
+  PENDING: "Pendiente",
+  VERIFIED: "Verificado",
+  REJECTED: "Rechazado",
+  MANUAL_REVIEW: "En revisión manual",
+};
 
 export default async function CuentaPage({
   searchParams,
@@ -35,7 +44,34 @@ export default async function CuentaPage({
     orderBy: { createdAt: "desc" },
   });
 
-  const isExcluded = Boolean(user?.selfExcludedUntil && user.selfExcludedUntil > new Date());
+  const paymentClaims = await prisma.paymentClaim.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const referralCode = await getOrCreateReferralCode(userId);
+  const referrals = await prisma.user.findMany({
+    where: { referredById: userId },
+    select: { id: true, name: true, email: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("host") ?? "localhost:3000";
+  const proto = requestHeaders.get("x-forwarded-proto") ?? "http";
+  const referralLink = `${proto}://${host}/registro?ref=${referralCode}`;
+
+  const now = new Date();
+  const isExcluded = Boolean(user?.selfExcludedUntil && user.selfExcludedUntil > now);
+
+  const expiringSoon = subscriptions.find((s) => {
+    if (s.status !== "ACTIVE" || !s.endDate) return false;
+    const daysLeft = (s.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    return daysLeft > 0 && daysLeft <= 5;
+  });
+  const daysUntilExpiry = expiringSoon?.endDate
+    ? Math.ceil((expiringSoon.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
@@ -48,6 +84,21 @@ export default async function CuentaPage({
         </p>
       )}
 
+      {expiringSoon && (
+        <div className="bg-navy text-chalk px-4 py-3 mb-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm">
+            Tu plan <span className="font-semibold">{expiringSoon.plan.name}</span> vence en{" "}
+            <span className="font-semibold">
+              {daysUntilExpiry} día{daysUntilExpiry === 1 ? "" : "s"}
+            </span>
+            .
+          </p>
+          <Link href="/planes" className="bg-red px-4 py-1.5 text-sm font-display tracking-wide hover:bg-red-dark transition-colors">
+            Renovar
+          </Link>
+        </div>
+      )}
+
       <section className="mb-10">
         <h2 className="font-display text-xl mb-4">Suscripciones</h2>
         {subscriptions.length === 0 ? (
@@ -58,6 +109,51 @@ export default async function CuentaPage({
               <li key={s.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
                 <span>{s.plan.name}</span>
                 <span className="font-semibold">{s.status}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-display text-xl mb-4">Historial de pagos</h2>
+        {paymentClaims.length === 0 ? (
+          <p className="text-fg/60">Aún no has registrado ningún pago.</p>
+        ) : (
+          <ul className="space-y-2">
+            {paymentClaims.map((p) => (
+              <li key={p.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
+                <div>
+                  <p className="stat-num font-semibold">
+                    {(p.amountMXN / 100).toLocaleString("es-MX", { style: "currency", currency: "MXN" })}
+                  </p>
+                  <p className="text-xs text-fg/50">{p.createdAt.toLocaleDateString("es-MX")}</p>
+                </div>
+                <span className="text-xs font-display tracking-wide">
+                  {PAYMENT_STATUS_LABEL[p.status] ?? p.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-display text-xl mb-2">Invita a un amigo</h2>
+        <p className="text-sm text-fg/60 mb-4">
+          Comparte tu link — cuando alguien se registre con él, queda ligado a tu cuenta.
+        </p>
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <code className="border border-fg/10 bg-surface px-3 py-2 text-sm break-all">{referralLink}</code>
+        </div>
+        {referrals.length === 0 ? (
+          <p className="text-fg/60 text-sm">Todavía no has invitado a nadie.</p>
+        ) : (
+          <ul className="space-y-2">
+            {referrals.map((r) => (
+              <li key={r.id} className="border border-fg/10 px-4 py-3 flex items-center justify-between text-sm">
+                <span>{r.name ?? r.email}</span>
+                <span className="text-xs text-fg/50">{r.createdAt.toLocaleDateString("es-MX")}</span>
               </li>
             ))}
           </ul>

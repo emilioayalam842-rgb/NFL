@@ -12,15 +12,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Datos inválidos." }, { status: 400 });
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, ref } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return NextResponse.json({ error: "Ese correo ya está registrado." }, { status: 409 });
   }
 
+  const referredBy = ref ? await prisma.user.findUnique({ where: { referralCode: ref } }) : null;
+
   const passwordHash = await bcrypt.hash(password, 12);
-  await prisma.user.create({ data: { name, email, passwordHash } });
+  await prisma.user.create({
+    data: { name, email, passwordHash, referredById: referredBy?.id },
+  });
 
   return NextResponse.json({ ok: true });
 }

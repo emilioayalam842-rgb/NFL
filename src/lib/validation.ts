@@ -9,6 +9,7 @@ export const registerSchema = z.object({
   name: z.string().min(2).max(60),
   email: z.string().email(),
   password: z.string().min(8).max(72),
+  ref: z.string().max(20).optional(),
 });
 
 export const paymentClaimSchema = z.object({

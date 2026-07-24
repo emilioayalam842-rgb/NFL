@@ -25,6 +25,13 @@ model User {
   // from purchasing/renewing subscriptions until this date passes.
   selfExcludedUntil DateTime?
 
+  // Referrals: generated lazily (on first visit to /cuenta) rather than at
+  // signup, so adding this to existing users needs no backfill migration.
+  referralCode String? @unique
+  referredById String?
+  referredBy   User?   @relation("Referrals", fields: [referredById], references: [id])
+  referrals    User[]  @relation("Referrals")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

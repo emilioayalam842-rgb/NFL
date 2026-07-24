@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { AuthShell } from "@/components/auth-shell";
 
 export default function RegistroPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,6 +23,7 @@ export default function RegistroPage() {
       name: form.get("name"),
       email: form.get("email"),
       password: form.get("password"),
+      ref: ref || undefined,
     };
 
     const res = await fetch("/api/registro", {
@@ -53,7 +56,11 @@ export default function RegistroPage() {
 
   return (
     <AuthShell>
-      <h1 className="text-3xl mb-8">Crear cuenta</h1>
+      <h1 className="text-3xl mb-2">Crear cuenta</h1>
+      {ref && (
+        <p className="text-sm text-fg/60 mb-6">Te invitó un amigo — quedará registrado al crear tu cuenta.</p>
+      )}
+      {!ref && <div className="mb-8" />}
 
       {error && (
         <p className="bg-red/10 text-red text-sm px-4 py-3 mb-6 border border-red/30">{error}</p>
