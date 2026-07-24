@@ -3,6 +3,7 @@ import { Anton, Barlow, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { InlineScript } from "@/components/inline-script";
 import { auth } from "@/auth";
 
 const anton = Anton({
@@ -49,7 +50,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <InlineScript html={THEME_INIT_SCRIPT} />
       </head>
       <body className="min-h-full flex flex-col bg-page text-fg">
         <SiteHeader session={session} />
