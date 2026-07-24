@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+
+  /* Fixed brand colors — identical in both themes, used for deliberately
+     high-contrast combos (navy/red hero & nav chrome, solid badges) that
+     should never invert. */
+  --color-navy: #041e42;
+  --color-navy-dark: #010e21;
+  --color-red: #d50a0a;
+  --color-red-dark: #970606;
+  --color-cream: #f4f1ea;
+  --color-ink: #14161a;
+  --color-chalk: #f9f7f2;
+
+  /* Theme-aware tokens — these are the ones that actually flip between
+     day/night mode. */
+  --color-page: #f4f1ea;
+  --color-surface: #f9f7f2;
+  --color-surface-alt: #e8e3d6;
+  --color-fg: #14161a;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-page: #0b0d12;
+  --color-surface: #14171f;
+  --color-surface-alt: #1a1e28;
+  --color-fg: #e8e3d6;
+}
+
+@theme inline {
+  --color-navy: var(--color-navy);
+  --color-navy-dark: var(--color-navy-dark);
+  --color-red: var(--color-red);
+  --color-red-dark: var(--color-red-dark);
+  --color-cream: var(--color-cream);
+  --color-ink: var(--color-ink);
+  --color-chalk: var(--color-chalk);
+  --color-page: var(--color-page);
+  --color-surface: var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-fg: var(--color-fg);
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-barlow);
+  --font-mono: var(--font-jetbrains);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-fg) 6%, transparent) 1px, transparent 0);
+  background-size: 22px 22px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.stat-num {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Angled divider used between sections instead of a straight rule —
+   a small nod to a yard-line/end-zone stripe rather than a plain <hr>. */
+.hash-divider {
+  height: 10px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-red) 0 10px,
+    transparent 10px 20px
+  );
+  opacity: 0.9;
+}
+
+.ticker-track {
+  animation: ticker 32s linear infinite;
+}
+
+/* Angled buttons — a cut corner + a hard offset shadow that pops on
+   hover, instead of a flat rectangle or a soft rounded/gradient pill. */
+.btn {
+  --btn-shadow: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  box-shadow: 5px 5px 0 0 var(--btn-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 0 var(--btn-shadow);
+}
+
+.btn:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 0 var(--btn-shadow);
+}
+
+.btn-primary {
+  background: var(--color-red);
+  color: var(--color-chalk);
+  --btn-shadow: var(--color-navy-dark);
+}
+.btn-primary:hover {
+  background: var(--color-red-dark);
+}
+
+.btn-dark {
+  background: var(--color-navy);
+  color: var(--color-chalk);
+  --btn-shadow: var(--color-red);
+}
+.btn-dark:hover {
+  background: var(--color-navy-dark);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-chalk);
+  border: 1px solid color-mix(in srgb, var(--color-chalk) 40%, transparent);
+  --btn-shadow: var(--color-red);
+}
+.btn-outline:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.btn-outline-dark {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  --btn-shadow: var(--color-navy);
+}
+.btn-outline-dark:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.btn-sm {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.8rem;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  box-shadow: 3px 3px 0 0 var(--btn-shadow);
+}
+.btn-sm:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 0 var(--btn-shadow);
+}
+.btn-sm:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 0 var(--btn-shadow);
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
